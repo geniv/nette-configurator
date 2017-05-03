@@ -1,0 +1,2 @@
+# nette-configurator
+Configurator component

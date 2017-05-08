@@ -13,7 +13,6 @@ use Nette\Caching\IStorage;
  * Class Configurator
  *
  * @author  geniv
- * @package Configurator
  */
 class Configurator extends Control
 {

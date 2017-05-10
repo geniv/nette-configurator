@@ -44,7 +44,7 @@ class Configurator extends Control
 
 
     /**
-     * ovladani automatickeho vytvareni
+     * Control automatic create ident.
      *
      * @param $status
      * @return $this
@@ -57,7 +57,11 @@ class Configurator extends Control
 
 
     /**
-     * volani uzivatelsky definovanych extra sloupcu
+     * Overloading is and get method.
+     *
+     * echo: {control config:editor 'identEditor1'}
+     * return: {control config:editor 'identEditor1', true}
+     * return is enabled: $presenter['config']->isEnableEditor('identEditor1')
      *
      * @param $name
      * @param $args
@@ -109,7 +113,7 @@ class Configurator extends Control
 
 
     /**
-     * vkladani polozky
+     * Insert item.
      *
      * @param $type
      * @param $ident
@@ -128,7 +132,7 @@ class Configurator extends Control
         if (!$id_ident) {
             $id_ident = $this->database->insert($this->tableConfiguratorIdent, $arr)
                 ->onDuplicateKeyUpdate('%a', $arr)
-                ->execute(dibi::IDENTIFIER);
+                ->execute(Dibi::IDENTIFIER);
         }
 
         // overeni existence
@@ -153,10 +157,7 @@ class Configurator extends Control
 
 
     /**
-     * nacitani a zpracovani dat
-     *
-     * @throws Exception
-     * @throws Throwable
+     * Load data.
      */
     private function loadData()
     {

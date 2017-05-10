@@ -2,7 +2,6 @@
 
 use Dibi\Connection;
 use Dibi\Result;
-use Exception;
 use LocaleServices\LocaleService;
 use Nette\Application\UI\Control;
 use Nette\Caching\Cache;
@@ -26,10 +25,10 @@ class Configurator extends Control
      *
      * @param               $tableConfigurator
      * @param Connection    $database
-     * @param LocaleService $language
+     * @param LocaleService $localeService
      * @param IStorage      $cacheStorage
      */
-    public function __construct($tableConfigurator, Connection $database, LocaleService $language, IStorage $cacheStorage)
+    public function __construct($tableConfigurator, Connection $database, LocaleService $localeService, IStorage $cacheStorage)
     {
         parent::__construct();
 
@@ -38,7 +37,7 @@ class Configurator extends Control
         $this->database = $database;
         $this->cache = new Cache($cacheStorage, 'cache' . __CLASS__);
 
-        $this->idLocale = $language->getId();
+        $this->idLocale = $localeService->getId();
 
         $this->loadData();  // nacteni dat
     }

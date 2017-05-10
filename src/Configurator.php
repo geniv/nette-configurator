@@ -15,8 +15,17 @@ use Nette\Caching\IStorage;
  */
 class Configurator extends Control
 {
+    /** @var string tables name */
     private $tableConfigurator, $tableConfiguratorIdent;
-    private $database, $idLocale, $cache, $values;
+    /** @var Connection database */
+    private $database;
+    /** @var int id locale */
+    private $idLocale;
+    /** @var Cache caching */
+    private $cache;
+    /** @var array internal data */
+    private $values;
+    /** @var bool implicit value */
     private $autoCreate = true;
 
 

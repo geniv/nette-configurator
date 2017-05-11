@@ -17,8 +17,8 @@ class Configurator extends Control
 {
     /** @var string tables name */
     private $tableConfigurator, $tableConfiguratorIdent;
-    /** @var Connection database */
-    private $database;
+    /** @var Connection connection */
+    private $connection;
     /** @var int id locale */
     private $idLocale;
     /** @var Cache caching */
@@ -33,18 +33,18 @@ class Configurator extends Control
      * Configurator constructor.
      *
      * @param               $tableConfigurator
-     * @param Connection    $database
+     * @param Connection    $connection
      * @param LocaleService $localeService
-     * @param IStorage      $cacheStorage
+     * @param IStorage      $storage
      */
-    public function __construct($tableConfigurator, Connection $database, LocaleService $localeService, IStorage $cacheStorage)
+    public function __construct($tableConfigurator, Connection $connection, LocaleService $localeService, IStorage $storage)
     {
         parent::__construct();
 
         $this->tableConfigurator = $tableConfigurator;
         $this->tableConfiguratorIdent = $tableConfigurator . '_ident';
-        $this->database = $database;
-        $this->cache = new Cache($cacheStorage, 'cache' . __CLASS__);
+        $this->connection = $connection;
+        $this->cache = new Cache($storage, 'cache' . __CLASS__);
 
         $this->idLocale = $localeService->getId();
 
@@ -68,6 +68,7 @@ class Configurator extends Control
     /**
      * Overloading is and get method.
      *
+     * LATTE:
      * echo: {control config:editor 'identEditor1'}
      * return: {control config:editor 'identEditor1', true}
      * return is enabled: $presenter['config']->isEnableEditor('identEditor1')
@@ -132,33 +133,33 @@ class Configurator extends Control
     {
         $arr = ['ident' => $ident];
         // nacte identifikator
-        $id_ident = $this->database->select('id')
+        $id_ident = $this->connection->select('id')
             ->from($this->tableConfiguratorIdent)
             ->where($arr)
             ->fetchSingle();
 
         // pokud se nenajde tak se vlozi novy
         if (!$id_ident) {
-            $id_ident = $this->database->insert($this->tableConfiguratorIdent, $arr)
+            $id_ident = $this->connection->insert($this->tableConfiguratorIdent, $arr)
                 ->onDuplicateKeyUpdate('%a', $arr)
                 ->execute(Dibi::IDENTIFIER);
         }
 
         // overeni existence
-        $conf = $this->database->select('id')
+        $conf = $this->connection->select('id')
             ->from($this->tableConfigurator)
             ->where(['id_locale' => null, 'id_ident' => $id_ident])
             ->fetchSingle();
 
         if (!$conf) {
             $values = [
-                // 'id_locale' => $this->idLocale, // ukladani bez lokalizace a lokalizace se bude pridelovat dodatecne
-                'type'     => $type,
-                'id_ident' => $id_ident,
-                'content'  => '## ' . $type . ' - ' . $ident . ' ##',
-                'enable'   => 1,
+                'id_locale' => null,    // ukladani bez lokalizace, lokalizace se bude pridelovat dodatecne
+                'type'      => $type,
+                'id_ident'  => $id_ident,
+                'content'   => '## ' . $type . ' - ' . $ident . ' ##',
+                'enable'    => 1,
             ];
-            return $this->database->insert($this->tableConfigurator, $values)
+            return $this->connection->insert($this->tableConfigurator, $values)
                 ->execute(Dibi::IDENTIFIER);
         }
         return null;
@@ -172,13 +173,13 @@ class Configurator extends Control
     {
         $values = $this->cache->load('values' . $this->idLocale);
         if ($values === null) {
-            $types = $this->database->select('id, type')
+            $types = $this->connection->select('id, type')
                 ->from($this->tableConfigurator)
                 ->groupBy('type')
                 ->fetchPairs('id', 'type');
 
             foreach ($types as $type) {
-                $items = $this->database->select('c.id, i.ident, c.content, c.enable')
+                $items = $this->connection->select('c.id, i.ident, c.content, c.enable')
                     ->from($this->tableConfigurator)->as('c')
                     ->join($this->tableConfiguratorIdent)->as('i')->on('i.id=c.id_ident')
                     ->where('c.type=%s', $type)

@@ -1,9 +1,9 @@
 <?php
 
+use Nette\Application\UI\Control;
 use Dibi\Connection;
 use Dibi\Result;
-use LocaleServices\LocaleService;
-use Nette\Application\UI\Control;
+use Locale\Locale;
 use Nette\Caching\Cache;
 use Nette\Caching\IStorage;
 
@@ -17,7 +17,7 @@ class Configurator extends Control
 {
     /** @var string tables name */
     private $tableConfigurator, $tableConfiguratorIdent;
-    /** @var Connection connection */
+    /** @var Connection database connection from DI */
     private $connection;
     /** @var int id locale */
     private $idLocale;
@@ -32,12 +32,12 @@ class Configurator extends Control
     /**
      * Configurator constructor.
      *
-     * @param               $tableConfigurator
-     * @param Connection    $connection
-     * @param LocaleService $localeService
-     * @param IStorage      $storage
+     * @param            $tableConfigurator
+     * @param Connection $connection
+     * @param Locale     $locale
+     * @param IStorage   $storage
      */
-    public function __construct($tableConfigurator, Connection $connection, LocaleService $localeService, IStorage $storage)
+    public function __construct($tableConfigurator, Connection $connection, Locale $locale, IStorage $storage)
     {
         parent::__construct();
 
@@ -46,7 +46,7 @@ class Configurator extends Control
         $this->connection = $connection;
         $this->cache = new Cache($storage, 'cache' . __CLASS__);
 
-        $this->idLocale = $localeService->getId();
+        $this->idLocale = $locale->getId();
 
         $this->loadData();  // nacteni dat
     }

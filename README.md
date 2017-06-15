@@ -14,8 +14,9 @@ or
 
 internal dependency:
 ```json
+"nette/nette": ">=2.4.0",
 "dibi/dibi": ">=3.0.0",
-"geniv/nette-locale": ">=1.0"
+"geniv/nette-locale": ">=1.0.0"
 ```
 
 Include in application
@@ -39,9 +40,19 @@ protected function createComponentConfig(Configurator $configurator)
 }
 ```
 
+```php
+$this['config']->isEnableText('ident');
+
+$this['config']->renderText('ident');
+
+$this['config']->renderText('ident', true);
+```
+
 usage:
 ```latte
 {control config:text 'web-title'}
+
+{control config:text 'web-title', true}
 
 <h1 n:if="$presenter['config']->isEnableText('web-title')">{control config:text 'web-title'}</h1>
 ```

@@ -44,7 +44,7 @@ class Configurator extends Control
         $this->tableConfigurator = $tableConfigurator;
         $this->tableConfiguratorIdent = $tableConfigurator . '_ident';
         $this->connection = $connection;
-        $this->cache = new Cache($storage, 'cache' . __CLASS__);
+        $this->cache = new Cache($storage, 'cache-Configurator');
 
         $this->idLocale = $locale->getId();
 
@@ -131,16 +131,17 @@ class Configurator extends Control
      */
     private function addData($type, $ident)
     {
+        $result = null;
         $arr = ['ident' => $ident];
         // nacte identifikator
-        $id_ident = $this->connection->select('id')
+        $idIdent = $this->connection->select('id')
             ->from($this->tableConfiguratorIdent)
             ->where($arr)
             ->fetchSingle();
 
         // pokud se nenajde tak se vlozi novy
-        if (!$id_ident) {
-            $id_ident = $this->connection->insert($this->tableConfiguratorIdent, $arr)
+        if (!$idIdent) {
+            $idIdent = $this->connection->insert($this->tableConfiguratorIdent, $arr)
                 ->onDuplicateKeyUpdate('%a', $arr)
                 ->execute(Dibi::IDENTIFIER);
         }
@@ -148,21 +149,25 @@ class Configurator extends Control
         // overeni existence
         $conf = $this->connection->select('id')
             ->from($this->tableConfigurator)
-            ->where(['id_locale' => null, 'id_ident' => $id_ident])
+            ->where(['id_locale' => null, 'id_ident' => $idIdent])
             ->fetchSingle();
 
         if (!$conf) {
             $values = [
                 'id_locale' => null,    // ukladani bez lokalizace, lokalizace se bude pridelovat dodatecne
                 'type'      => $type,
-                'id_ident'  => $id_ident,
+                'id_ident'  => $idIdent,
                 'content'   => '## ' . $type . ' - ' . $ident . ' ##',
                 'enable'    => 1,
             ];
-            return $this->connection->insert($this->tableConfigurator, $values)
-                ->execute(Dibi::IDENTIFIER);
+            $result = $this->connection->insert($this->tableConfigurator, $values)
+                ->execute();
+
+            $this->cache->clean([
+                Cache::TAGS => ['loadData'],
+            ]);
         }
-        return null;
+        return $result;
     }
 
 

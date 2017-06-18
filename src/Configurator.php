@@ -187,8 +187,8 @@ class Configurator extends Control
                 $items = $this->connection->select('c.id, i.ident, c.content, c.enable')
                     ->from($this->tableConfigurator)->as('c')
                     ->join($this->tableConfiguratorIdent)->as('i')->on('i.id=c.id_ident')
-                    ->where('c.type=%s', $type)
-                    ->where('(c.id_locale=%i OR c.id_locale IS NULL)', $this->idLocale)
+                    ->where(['c.type' => $type])
+                    ->where('(%or)', ['c.id_locale%i' => $this->idLocale, 'c.id_locale' => null])
                     ->orderBy('c.id_locale')->desc();
 
                 $values[$type] = $items->fetchAssoc('ident');

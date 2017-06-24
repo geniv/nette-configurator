@@ -15,6 +15,11 @@ use Nette\Caching\IStorage;
  */
 class Configurator extends Control
 {
+    // define constant table names
+    const
+        TABLE_NAME = 'configurator',
+        TABLE_NAME_IDENT = 'configurator_ident';
+
     /** @var string tables name */
     private $tableConfigurator, $tableConfiguratorIdent;
     /** @var Connection database connection from DI */
@@ -32,17 +37,19 @@ class Configurator extends Control
     /**
      * Configurator constructor.
      *
-     * @param            $tableConfigurator
+     * @param            $prefix
      * @param Connection $connection
      * @param Locale     $locale
      * @param IStorage   $storage
      */
-    public function __construct($tableConfigurator, Connection $connection, Locale $locale, IStorage $storage)
+    public function __construct($prefix, Connection $connection, Locale $locale, IStorage $storage)
     {
         parent::__construct();
 
-        $this->tableConfigurator = $tableConfigurator;
-        $this->tableConfiguratorIdent = $tableConfigurator . '_ident';
+        // define table names
+        $this->tableConfigurator = $prefix . self::TABLE_NAME;
+        $this->tableConfiguratorIdent = $prefix . self::TABLE_NAME_IDENT;
+
         $this->connection = $connection;
         $this->cache = new Cache($storage, 'cache-Configurator');
 
@@ -184,11 +191,12 @@ class Configurator extends Control
                 ->fetchPairs('id', 'type');
 
             foreach ($types as $type) {
-                $items = $this->connection->select('c.id, i.ident, c.content, c.enable')
+                $items = $this->connection->select('c.id, i.ident, IFNULL(lo_c.content, c.content) content, IFNULL(lo_c.enable, c.enable) enable')
                     ->from($this->tableConfigurator)->as('c')
                     ->join($this->tableConfiguratorIdent)->as('i')->on('i.id=c.id_ident')
-                    ->where('c.type=%s', $type)
-                    ->where('(c.id_locale=%i OR c.id_locale IS NULL)', $this->idLocale)
+                    ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=i.id')->and('lo_c.id_locale=%i', $this->idLocale)
+                    ->where(['c.type' => $type, 'c.id_locale' => null])
+                    ->groupBy('i.id')
                     ->orderBy('c.id_locale')->desc();
 
                 $values[$type] = $items->fetchAssoc('ident');

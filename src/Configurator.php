@@ -15,6 +15,11 @@ use Nette\Caching\IStorage;
  */
 class Configurator extends Control
 {
+    // define constant table names
+    const
+        TABLE_NAME = 'configurator',
+        TABLE_NAME_IDENT = 'configurator_ident';
+
     /** @var string tables name */
     private $tableConfigurator, $tableConfiguratorIdent;
     /** @var Connection database connection from DI */
@@ -32,17 +37,19 @@ class Configurator extends Control
     /**
      * Configurator constructor.
      *
-     * @param            $tableConfigurator
+     * @param            $prefix
      * @param Connection $connection
      * @param Locale     $locale
      * @param IStorage   $storage
      */
-    public function __construct($tableConfigurator, Connection $connection, Locale $locale, IStorage $storage)
+    public function __construct($prefix, Connection $connection, Locale $locale, IStorage $storage)
     {
         parent::__construct();
 
-        $this->tableConfigurator = $tableConfigurator;
-        $this->tableConfiguratorIdent = $tableConfigurator . '_ident';
+        // define table names
+        $this->tableConfigurator = $prefix . self::TABLE_NAME;
+        $this->tableConfiguratorIdent = $prefix . self::TABLE_NAME_IDENT;
+
         $this->connection = $connection;
         $this->cache = new Cache($storage, 'cache-Configurator');
 

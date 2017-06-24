@@ -25,7 +25,7 @@ Include in application
 neon configure:
 ```neon
 services:
-    - Configurator(%tb_configurator%)
+    - Configurator(%tablePrefix%)
 ```
 
 usage:

@@ -9,7 +9,7 @@ $ composer require geniv/nette-configurator
 ```
 or
 ```json
-"geniv/nette-configurator": ">=1.0"
+"geniv/nette-configurator": ">=1.0.0"
 ```
 
 require:

@@ -41,11 +41,17 @@ protected function createComponentConfig(Configurator $configurator)
 ```
 
 ```php
+// return bool of enabled ident
 $this['config']->isEnableText('ident');
 
+// echo value of ident
 $this['config']->renderText('ident');
 
+// return value of ident
 $this['config']->renderText('ident', true);
+
+// return value of show-web-title
+$this['config']->renderCheckbox('show-web-title', true);
 ```
 
 usage:
@@ -55,4 +61,6 @@ usage:
 {control config:text 'web-title', true}
 
 <h1 n:if="$presenter['config']->isEnableText('web-title')">{control config:text 'web-title'}</h1>
+
+<h1 n:if="$presenter['config']->renderCheckbox('show-web-title', true)">{control config:text 'web-title'}</h1>
 ```

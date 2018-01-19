@@ -6,7 +6,7 @@
     "configurator",
     "geniv"
   ],
-  "license": "GPL-3.0",
+  "license": "MIT",
   "authors": [
     {
       "name": "Radek Fryšták",

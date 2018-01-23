@@ -3,7 +3,7 @@
 use Nette\Application\UI\Control;
 use Dibi\Connection;
 use Dibi\Result;
-use Locale\Locale;
+use Locale\ILocale;
 use Nette\Caching\Cache;
 use Nette\Caching\IStorage;
 
@@ -39,10 +39,10 @@ class Configurator extends Control
      *
      * @param            $prefix
      * @param Connection $connection
-     * @param Locale     $locale
+     * @param ILocale    $locale
      * @param IStorage   $storage
      */
-    public function __construct($prefix, Connection $connection, Locale $locale, IStorage $storage)
+    public function __construct($prefix, Connection $connection, ILocale $locale, IStorage $storage)
     {
         parent::__construct();
 

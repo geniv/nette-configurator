@@ -84,6 +84,7 @@ class Configurator extends Control
      * @param $args
      * @return mixed|void
      * @throws Exception
+     * @throws \Dibi\Exception
      */
     public function __call($name, $args)
     {
@@ -135,6 +136,7 @@ class Configurator extends Control
      * @param $type
      * @param $ident
      * @return Result|int|null
+     * @throws \Dibi\Exception
      */
     private function addData($type, $ident)
     {

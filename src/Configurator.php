@@ -79,6 +79,7 @@ class Configurator extends Control
      * echo: {control config:editor 'identEditor1'}
      * return: {control config:editor 'identEditor1', true}
      * return is enabled: $presenter['config']->isEnableEditor('identEditor1')
+     * set data: $presenter['config']->setTranslator('ident', 'text')
      *
      * @param $name
      * @param $args
@@ -91,17 +92,22 @@ class Configurator extends Control
         if (!in_array($name, ['onAnchor'])) {   // nesmi zachytavat definovane metody
             $method = strtolower(substr($name, 6)); // nacteni jmena
             if (!isset($args[0])) {
-                throw new Exception('Nebyl zadany parametr identu.');
+                throw new Exception('Don`t use Nebyl zadany parametr identu.');
             }
             $ident = $args[0];  // nacteni identu
             $return = (isset($args[1]) ? $args[1] : false);
+
+            if (substr($name, 0, 3) == 'set') {
+                $method = strtolower(substr($name, 3));
+                dump($method);
+            }
 
             // nacteni enable
             if (substr($name, 0, 8) == 'isEnable') {
                 $method = strtolower(substr($name, 8));
                 if (isset($this->values[$method][$ident])) {
                     $block = $this->values[$method][$ident];
-                    return $block->enable;
+                    return $block['enable'];
                 }
             }
 
@@ -116,15 +122,15 @@ class Configurator extends Control
                 $block = $this->values[$method];
                 if (isset($block[$ident])) {
                     if ($return) {
-                        return ($block[$ident]->enable ? $block[$ident]->content : null);
+                        return ($block[$ident]['enable'] ? $block[$ident]['content'] : null);
                     }
-                    echo($block[$ident]->enable ? $block[$ident]->content : null);
+                    echo($block[$ident]['enable'] ? $block[$ident]['content'] : null);
 
                 } else {
-                    throw new Exception('Nebyl nalezeny ident ' . $ident . '.');
+                    throw new Exception('Don`t find identification: ' . $ident . '.');
                 }
             } else {
-                throw new Exception('Nebyl nalezeny platny blok. Blok ' . $method . ' neexistuje.');
+                throw new Exception('Don`t find valid block. Block ' . $method . ' don`t exists.');
             }
         }
     }
@@ -133,12 +139,13 @@ class Configurator extends Control
     /**
      * Insert item.
      *
-     * @param $type
-     * @param $ident
+     * @param      $type
+     * @param      $ident
+     * @param null $content
      * @return Result|int|null
      * @throws \Dibi\Exception
      */
-    private function addData($type, $ident)
+    private function addData($type, $ident, $content = null)
     {
         $result = null;
         $arr = ['ident' => $ident];
@@ -166,7 +173,7 @@ class Configurator extends Control
                 'id_locale' => null,    // ukladani bez lokalizace, lokalizace se bude pridelovat dodatecne
                 'type'      => $type,
                 'id_ident'  => $idIdent,
-                'content'   => '## ' . $type . ' - ' . $ident . ' ##',
+                'content'   => $content ?: '## ' . $type . ' - ' . $ident . ' ##',
                 'enable'    => 1,
             ];
             $result = $this->connection->insert($this->tableConfigurator, $values)
@@ -210,5 +217,11 @@ class Configurator extends Control
             ]);
         }
         $this->values = $values;
+    }
+
+
+    public function loadDataByType($type)
+    {
+        dump($type);
     }
 }

@@ -100,10 +100,7 @@ class Configurator extends Control
             if (substr($name, 0, 3) == 'set') {
                 $method = strtolower(substr($name, 3));
 
-//                $this->addData($method, $ident);
-
-                dump($method, $name, $args);
-//                $this->addData($method, $ident);    // vlozeni
+                $this->addData($method, $ident, $ident);
             }
 
             // nacteni enable

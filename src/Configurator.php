@@ -100,7 +100,7 @@ class Configurator extends Control
             if (substr($name, 0, 3) == 'set') {
                 $method = strtolower(substr($name, 3));
 
-                $this->addData($method, $ident, $ident);
+                $this->addData($method, $ident, $ident);    //TODO vkladani defaultnich hodnot!
             }
 
             // nacteni enable

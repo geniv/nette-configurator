@@ -90,18 +90,19 @@ class Configurator extends Control
     public function __call($name, $args)
     {
         if (!in_array($name, ['onAnchor'])) {   // nesmi zachytavat definovane metody
-            $method = strtolower(substr($name, 6)); // nacteni jmena
+            // set method
+            if (substr($name, 0, 3) == 'set' && isset($args[0]) && isset($args[1])) {
+                $method = strtolower(substr($name, 3));
+                $this->addData($method, $args[0], $args[1]);
+            }
+
+            // load method name
+            $method = strtolower(substr($name, 6));
             if (!isset($args[0])) {
-                throw new Exception('Don`t use Nebyl zadany parametr identu.');
+                throw new Exception('Identification parameter is not used.');
             }
             $ident = $args[0];  // nacteni identu
             $return = (isset($args[1]) ? $args[1] : false);
-
-            if (substr($name, 0, 3) == 'set') {
-                $method = strtolower(substr($name, 3));
-
-                $this->addData($method, $ident, $ident);    //TODO vkladani defaultnich hodnot!
-            }
 
             // nacteni enable
             if (substr($name, 0, 8) == 'isEnable') {
@@ -128,10 +129,10 @@ class Configurator extends Control
                     echo($block[$ident]['enable'] ? $block[$ident]['content'] : null);
 
                 } else {
-                    throw new Exception('Don`t find identification: ' . $ident . '.');
+                    throw new Exception('Identification is not find: ' . $ident . '.');
                 }
             } else {
-                throw new Exception('Don`t find valid block. Block ' . $method . ' don`t exists.');
+                throw new Exception('Invalid block. Block ' . $method . ' don`t exists.');
             }
         }
     }

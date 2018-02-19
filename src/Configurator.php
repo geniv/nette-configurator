@@ -79,19 +79,27 @@ class Configurator extends Control
      * echo: {control config:editor 'identEditor1'}
      * return: {control config:editor 'identEditor1', true}
      * return is enabled: $presenter['config']->isEnableEditor('identEditor1')
+     * set data: $presenter['config']->setTranslator('ident', 'text')
      *
      * @param $name
      * @param $args
-     * @return mixed|void
+     * @return mixed
      * @throws Exception
      * @throws \Dibi\Exception
      */
     public function __call($name, $args)
     {
         if (!in_array($name, ['onAnchor'])) {   // nesmi zachytavat definovane metody
-            $method = strtolower(substr($name, 6)); // nacteni jmena
+            // set method
+            if (substr($name, 0, 3) == 'set' && isset($args[0]) && isset($args[1])) {
+                $method = strtolower(substr($name, 3));
+                return $this->addData($method, $args[0], $args[1]); // insert data + return out of method
+            }
+
+            // load method name
+            $method = strtolower(substr($name, 6));
             if (!isset($args[0])) {
-                throw new Exception('Nebyl zadany parametr identu.');
+                throw new Exception('Identification parameter is not used.');
             }
             $ident = $args[0];  // nacteni identu
             $return = (isset($args[1]) ? $args[1] : false);
@@ -101,7 +109,7 @@ class Configurator extends Control
                 $method = strtolower(substr($name, 8));
                 if (isset($this->values[$method][$ident])) {
                     $block = $this->values[$method][$ident];
-                    return $block->enable;
+                    return $block['enable'];
                 }
             }
 
@@ -116,15 +124,15 @@ class Configurator extends Control
                 $block = $this->values[$method];
                 if (isset($block[$ident])) {
                     if ($return) {
-                        return ($block[$ident]->enable ? $block[$ident]->content : null);
+                        return ($block[$ident]['enable'] ? $block[$ident]['content'] : null);
                     }
-                    echo($block[$ident]->enable ? $block[$ident]->content : null);
+                    echo($block[$ident]['enable'] ? $block[$ident]['content'] : null);
 
                 } else {
-                    throw new Exception('Nebyl nalezeny ident ' . $ident . '.');
+                    throw new Exception('Identification is not find: ' . $ident . '.');
                 }
             } else {
-                throw new Exception('Nebyl nalezeny platny blok. Blok ' . $method . ' neexistuje.');
+                throw new Exception('Invalid block. Block ' . $method . ' don`t exists.');
             }
         }
     }
@@ -133,12 +141,13 @@ class Configurator extends Control
     /**
      * Insert item.
      *
-     * @param $type
-     * @param $ident
+     * @param      $type
+     * @param      $ident
+     * @param null $content
      * @return Result|int|null
      * @throws \Dibi\Exception
      */
-    private function addData($type, $ident)
+    private function addData($type, $ident, $content = null)
     {
         $result = null;
         $arr = ['ident' => $ident];
@@ -148,14 +157,14 @@ class Configurator extends Control
             ->where($arr)
             ->fetchSingle();
 
-        // pokud se nenajde tak se vlozi novy
+        // insert new identification if not exist
         if (!$idIdent) {
             $idIdent = $this->connection->insert($this->tableConfiguratorIdent, $arr)
                 ->onDuplicateKeyUpdate('%a', $arr)
                 ->execute(Dibi::IDENTIFIER);
         }
 
-        // overeni existence
+        // check exist configure id
         $conf = $this->connection->select('id')
             ->from($this->tableConfigurator)
             ->where(['id_locale' => null, 'id_ident' => $idIdent])
@@ -166,7 +175,7 @@ class Configurator extends Control
                 'id_locale' => null,    // ukladani bez lokalizace, lokalizace se bude pridelovat dodatecne
                 'type'      => $type,
                 'id_ident'  => $idIdent,
-                'content'   => '## ' . $type . ' - ' . $ident . ' ##',
+                'content'   => $content ?: '## ' . $type . ' - ' . $ident . ' ##',
                 'enable'    => 1,
             ];
             $result = $this->connection->insert($this->tableConfigurator, $values)
@@ -193,13 +202,7 @@ class Configurator extends Control
                 ->fetchPairs('id', 'type');
 
             foreach ($types as $type) {
-                $items = $this->connection->select('c.id, i.ident, IFNULL(lo_c.content, c.content) content, IFNULL(lo_c.enable, c.enable) enable')
-                    ->from($this->tableConfigurator)->as('c')
-                    ->join($this->tableConfiguratorIdent)->as('i')->on('i.id=c.id_ident')
-                    ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=i.id')->and('lo_c.id_locale=%i', $this->idLocale)
-                    ->where(['c.type' => $type, 'c.id_locale' => null])
-                    ->groupBy('i.id')
-                    ->orderBy('c.id_locale')->desc();
+                $items = $this->loadDataByType($type);
 
                 $values[$type] = $items->fetchAssoc('ident');
             }
@@ -210,5 +213,24 @@ class Configurator extends Control
             ]);
         }
         $this->values = $values;
+    }
+
+
+    /**
+     * Load data by type.
+     *
+     * @param $type
+     * @return mixed
+     */
+    public function loadDataByType($type)
+    {
+        $result = $this->connection->select('c.id, i.ident, IFNULL(lo_c.content, c.content) content, IFNULL(lo_c.enable, c.enable) enable')
+            ->from($this->tableConfigurator)->as('c')
+            ->join($this->tableConfiguratorIdent)->as('i')->on('i.id=c.id_ident')
+            ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=i.id')->and('lo_c.id_locale=%i', $this->idLocale)
+            ->where(['c.type' => $type, 'c.id_locale' => null])
+            ->groupBy('i.id')
+            ->orderBy('c.id_locale')->desc();
+        return $result;
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use Dibi\Fluent;
 use Nette\Application\UI\Control;
 use Dibi\Connection;
 use Dibi\Result;
@@ -75,7 +76,7 @@ class Configurator extends Control
     /**
      * Overloading is and get method.
      *
-     * LATTE:
+     * use:
      * echo: {control config:editor 'identEditor1'}
      * return: {control config:editor 'identEditor1', true}
      * return is enabled: $presenter['config']->isEnableEditor('identEditor1')
@@ -201,9 +202,9 @@ class Configurator extends Control
                 ->groupBy('type')
                 ->fetchPairs('id', 'type');
 
+            // load rows by type
             foreach ($types as $type) {
                 $items = $this->loadDataByType($type);
-
                 $values[$type] = $items->fetchAssoc('ident');
             }
 
@@ -220,7 +221,7 @@ class Configurator extends Control
      * Load data by type.
      *
      * @param $type
-     * @return mixed
+     * @return Fluent
      */
     public function loadDataByType($type)
     {

@@ -203,13 +203,6 @@ class Configurator extends Control
 
             foreach ($types as $type) {
                 $items = $this->loadDataByType($type);
-//                $items = $this->connection->select('c.id, i.ident, IFNULL(lo_c.content, c.content) content, IFNULL(lo_c.enable, c.enable) enable')
-//                    ->from($this->tableConfigurator)->as('c')
-//                    ->join($this->tableConfiguratorIdent)->as('i')->on('i.id=c.id_ident')
-//                    ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=i.id')->and('lo_c.id_locale=%i', $this->idLocale)
-//                    ->where(['c.type' => $type, 'c.id_locale' => null])
-//                    ->groupBy('i.id')
-//                    ->orderBy('c.id_locale')->desc();
 
                 $values[$type] = $items->fetchAssoc('ident');
             }
@@ -223,6 +216,12 @@ class Configurator extends Control
     }
 
 
+    /**
+     * Load data by type.
+     *
+     * @param $type
+     * @return mixed
+     */
     public function loadDataByType($type)
     {
         $result = $this->connection->select('c.id, i.ident, IFNULL(lo_c.content, c.content) content, IFNULL(lo_c.enable, c.enable) enable')

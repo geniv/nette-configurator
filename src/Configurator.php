@@ -83,7 +83,7 @@ class Configurator extends Control
      *
      * @param $name
      * @param $args
-     * @return mixed|void
+     * @return mixed
      * @throws Exception
      * @throws \Dibi\Exception
      */
@@ -93,7 +93,7 @@ class Configurator extends Control
             // set method
             if (substr($name, 0, 3) == 'set' && isset($args[0]) && isset($args[1])) {
                 $method = strtolower(substr($name, 3));
-                $this->addData($method, $args[0], $args[1]);
+                return $this->addData($method, $args[0], $args[1]); // insert data + return out of method
             }
 
             // load method name
@@ -157,14 +157,14 @@ class Configurator extends Control
             ->where($arr)
             ->fetchSingle();
 
-        // pokud se nenajde tak se vlozi novy
+        // insert new identification if not exist
         if (!$idIdent) {
             $idIdent = $this->connection->insert($this->tableConfiguratorIdent, $arr)
                 ->onDuplicateKeyUpdate('%a', $arr)
                 ->execute(Dibi::IDENTIFIER);
         }
 
-        // overeni existence
+        // check exist configure id
         $conf = $this->connection->select('id')
             ->from($this->tableConfigurator)
             ->where(['id_locale' => null, 'id_ident' => $idIdent])

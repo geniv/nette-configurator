@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Dibi\Fluent;
 use Nette\Application\UI\Control;
@@ -38,12 +38,12 @@ class Configurator extends Control
     /**
      * Configurator constructor.
      *
-     * @param            $prefix
+     * @param string     $prefix
      * @param Connection $connection
      * @param ILocale    $locale
      * @param IStorage   $storage
      */
-    public function __construct($prefix, Connection $connection, ILocale $locale, IStorage $storage)
+    public function __construct(string $prefix, Connection $connection, ILocale $locale, IStorage $storage)
     {
         parent::__construct();
 
@@ -61,12 +61,12 @@ class Configurator extends Control
 
 
     /**
-     * Control automatic create ident.
+     * Set auto create.
      *
-     * @param $status
-     * @return $this
+     * @param bool $status
+     * @return Configurator
      */
-    public function setAutoCreate($status)
+    public function setAutoCreate(bool $status): self
     {
         $this->autoCreate = $status;
         return $this;
@@ -88,7 +88,7 @@ class Configurator extends Control
      * @throws Exception
      * @throws \Dibi\Exception
      */
-    public function __call($name, $args)
+    public function __call(string $name, array $args)
     {
         if (!in_array($name, ['onAnchor'])) {   // nesmi zachytavat definovane metody
             // set method
@@ -141,15 +141,15 @@ class Configurator extends Control
 
 
     /**
-     * Insert item.
+     * Add data.
      *
-     * @param      $type
-     * @param      $ident
-     * @param null $content
+     * @param string $type
+     * @param string $ident
+     * @param string $content
      * @return Result|int|null
      * @throws \Dibi\Exception
      */
-    private function addData($type, $ident, $content = null)
+    private function addData(string $type, string $ident, string $content = '')
     {
         $result = null;
         $arr = ['ident' => $ident];
@@ -224,7 +224,7 @@ class Configurator extends Control
      * @param $type
      * @return Fluent
      */
-    public function loadDataByType($type)
+    public function loadDataByType($type): Fluent
     {
         $result = $this->connection->select('c.id, i.ident, IFNULL(lo_c.content, c.content) content, IFNULL(lo_c.enable, c.enable) enable')
             ->from($this->tableConfigurator)->as('c')

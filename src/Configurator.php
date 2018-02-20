@@ -91,22 +91,21 @@ class Configurator extends Control
     public function __call($name, $args)
     {
         if (!in_array($name, ['onAnchor'])) {   // exclude method
-            // set method
-            if (substr($name, 0, 3) == 'set' && isset($args[0]) && isset($args[1])) {
-                $method = strtolower(substr($name, 3));
-                $this->addData($method, $args[0], $args[1]); // insert data + return out of method
-                return $args[1];
-            }
-
-            // load method name
-            $method = strtolower(substr($name, 6));
             if (!isset($args[0])) {
                 throw new Exception('Identification parameter is not used.');
             }
             $ident = $args[0];  // load identification
-            $return = (isset($args[1]) ? $args[1] : false);
+            $method = strtolower(substr($name, 6)); // load method name
+            $return = (isset($args[1]) ? $args[1] : false); // load result
 
-            // process enable
+            // set method (extended for translator)
+            if (substr($name, 0, 3) == 'set' && isset($ident) && isset($args[1])) {
+                $method = strtolower(substr($name, 3));
+                $this->addData($method, $ident, $args[1]); // insert data
+                return $args[1];    // return message only by create new translate
+            }
+
+            // enable method
             if (substr($name, 0, 8) == 'isEnable') {
                 $method = strtolower(substr($name, 8));
                 if (isset($this->values[$method][$ident])) {
@@ -121,7 +120,7 @@ class Configurator extends Control
                 $this->loadData();                  // reloading
             }
 
-            // load
+            // load value
             if (isset($this->values[$method])) {
                 $block = $this->values[$method];
                 if (isset($block[$ident])) {
@@ -134,7 +133,7 @@ class Configurator extends Control
                     throw new Exception('Identification is not find: ' . $ident . '.');
                 }
             } else {
-                throw new Exception('Invalid block. Block ' . $method . ' don`t exists.');
+                throw new Exception('Invalid block. Block: ' . $method . ' is not exists.');
             }
         }
     }
@@ -199,7 +198,7 @@ class Configurator extends Control
                 'id_locale' => null,    // save without idLocale! for default values
                 'type'      => $type,
                 'id_ident'  => $idIdent,
-                'content'   => $content ?: '## ' . $type . ' - ' . $ident . ' ##',
+                'content'   => ($content ?: '## ' . $type . ' - ' . $ident . ' ##'),
                 'enable'    => true,
             ];
             $result = $this->connection->insert($this->tableConfigurator, $values)

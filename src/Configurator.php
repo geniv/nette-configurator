@@ -186,17 +186,6 @@ class Configurator extends Control
         $result = null;
         $arr = ['ident' => $ident];
         // load identification
-//        $idIdent = $this->connection->select('id')
-//            ->from($this->tableConfiguratorIdent)
-//            ->where($arr)
-//            ->fetchSingle();
-//
-//        // insert new identification if not exist
-//        if (!$idIdent) {
-//            $idIdent = $this->connection->insert($this->tableConfiguratorIdent, $arr)
-//                ->onDuplicateKeyUpdate('%a', $arr)
-//                ->execute(Dibi::IDENTIFIER);
-//        }
         $idIdent = $this->getIdIdentification($arr);
 
         // check exist configure id

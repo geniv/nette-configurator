@@ -141,6 +141,38 @@ class Configurator extends Control
 
 
     /**
+     * Get id identification.
+     *
+     * @param array $values
+     * @return int
+     */
+    private function getIdIdentification(array $values): int
+    {
+        $key = 'getIdIdentification' . md5(implode($values));
+        $result = $this->cache->load($key);
+        if ($result === null) {
+            $result = $this->connection->select('id')
+                ->from($this->tableConfiguratorIdent)
+                ->where($values)
+                ->fetchSingle();
+
+            $this->cache->save($key, $result, [
+                Cache::EXPIRE => '30 minutes',
+                Cache::TAGS   => ['loadData'],
+            ]);
+        }
+
+        // insert new identification if not exist
+        if (!$result) {
+            $result = $this->connection->insert($this->tableConfiguratorIdent, $values)
+                ->onDuplicateKeyUpdate('%a', $values)
+                ->execute(Dibi::IDENTIFIER);
+        }
+        return $result;
+    }
+
+
+    /**
      * Add data.
      *
      * @param string $type
@@ -154,17 +186,18 @@ class Configurator extends Control
         $result = null;
         $arr = ['ident' => $ident];
         // load identification
-        $idIdent = $this->connection->select('id')
-            ->from($this->tableConfiguratorIdent)
-            ->where($arr)
-            ->fetchSingle();
-
-        // insert new identification if not exist
-        if (!$idIdent) {
-            $idIdent = $this->connection->insert($this->tableConfiguratorIdent, $arr)
-                ->onDuplicateKeyUpdate('%a', $arr)
-                ->execute(Dibi::IDENTIFIER);
-        }
+//        $idIdent = $this->connection->select('id')
+//            ->from($this->tableConfiguratorIdent)
+//            ->where($arr)
+//            ->fetchSingle();
+//
+//        // insert new identification if not exist
+//        if (!$idIdent) {
+//            $idIdent = $this->connection->insert($this->tableConfiguratorIdent, $arr)
+//                ->onDuplicateKeyUpdate('%a', $arr)
+//                ->execute(Dibi::IDENTIFIER);
+//        }
+        $idIdent = $this->getIdIdentification($arr);
 
         // check exist configure id
         $conf = $this->connection->select('id')

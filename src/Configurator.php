@@ -226,7 +226,10 @@ class Configurator extends Control
      */
     public function loadDataByType(string $type): Fluent
     {
-        $result = $this->connection->select('c.id, i.ident, IFNULL(lo_c.content, c.content) content, IFNULL(lo_c.enable, c.enable) enable')
+        $result = $this->connection->select('c.id, i.ident, ' .
+            'IFNULL(lo_c.content, c.content) content, ' .
+            'IFNULL(lo_c.enable, c.enable) enable, ' .
+            'IFNULL(lo_c.id_locale, c.id_locale) id_locale')
             ->from($this->tableConfigurator)->as('c')
             ->join($this->tableConfiguratorIdent)->as('i')->on('i.id=c.id_ident')
             ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=i.id')->and('lo_c.id_locale=%i', $this->idLocale)

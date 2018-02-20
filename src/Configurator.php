@@ -21,17 +21,17 @@ class Configurator extends Control
         TABLE_NAME = 'configurator',
         TABLE_NAME_IDENT = 'configurator_ident';
 
-    /** @var string tables name */
+    /** @var string */
     private $tableConfigurator, $tableConfiguratorIdent;
-    /** @var Connection database connection from DI */
+    /** @var Connection */
     private $connection;
-    /** @var int id locale */
+    /** @var int */
     private $idLocale;
-    /** @var Cache caching */
+    /** @var Cache */
     private $cache;
-    /** @var array internal data */
+    /** @var array */
     private $values;
-    /** @var bool implicit value */
+    /** @var bool */
     private $autoCreate = true;
 
 
@@ -56,7 +56,7 @@ class Configurator extends Control
 
         $this->idLocale = $locale->getId();
 
-        $this->loadData();  // nacteni dat
+        $this->loadData();  // load data
     }
 
 
@@ -90,7 +90,7 @@ class Configurator extends Control
      */
     public function __call(string $name, array $args)
     {
-        if (!in_array($name, ['onAnchor'])) {   // nesmi zachytavat definovane metody
+        if (!in_array($name, ['onAnchor'])) {   // exclude method
             // set method
             if (substr($name, 0, 3) == 'set' && isset($args[0]) && isset($args[1])) {
                 $method = strtolower(substr($name, 3));
@@ -103,10 +103,10 @@ class Configurator extends Control
             if (!isset($args[0])) {
                 throw new Exception('Identification parameter is not used.');
             }
-            $ident = $args[0];  // nacteni identu
+            $ident = $args[0];  // load identification
             $return = (isset($args[1]) ? $args[1] : false);
 
-            // nacteni enable
+            // process enable
             if (substr($name, 0, 8) == 'isEnable') {
                 $method = strtolower(substr($name, 8));
                 if (isset($this->values[$method][$ident])) {
@@ -115,13 +115,13 @@ class Configurator extends Control
                 }
             }
 
-            // vytvareni
+            // create
             if ($this->autoCreate && (!isset($this->values[$method]) || !isset($this->values[$method][$ident]))) {
-                $this->addData($method, $ident);    // vlozeni
-                $this->loadData();                  // znovunacteni
+                $this->addData($method, $ident);    // insert
+                $this->loadData();                  // reloading
             }
 
-            // nacitani
+            // load
             if (isset($this->values[$method])) {
                 $block = $this->values[$method];
                 if (isset($block[$ident])) {
@@ -153,7 +153,7 @@ class Configurator extends Control
     {
         $result = null;
         $arr = ['ident' => $ident];
-        // nacte identifikator
+        // load identification
         $idIdent = $this->connection->select('id')
             ->from($this->tableConfiguratorIdent)
             ->where($arr)
@@ -174,11 +174,11 @@ class Configurator extends Control
 
         if (!$conf) {
             $values = [
-                'id_locale' => null,    // ukladani bez lokalizace, lokalizace se bude pridelovat dodatecne
+                'id_locale' => null,    // save without idLocale! for default values
                 'type'      => $type,
                 'id_ident'  => $idIdent,
                 'content'   => $content ?: '## ' . $type . ' - ' . $ident . ' ##',
-                'enable'    => 1,
+                'enable'    => true,
             ];
             $result = $this->connection->insert($this->tableConfigurator, $values)
                 ->execute();
@@ -221,10 +221,10 @@ class Configurator extends Control
     /**
      * Load data by type.
      *
-     * @param $type
+     * @param string $type
      * @return Fluent
      */
-    public function loadDataByType($type): Fluent
+    public function loadDataByType(string $type): Fluent
     {
         $result = $this->connection->select('c.id, i.ident, IFNULL(lo_c.content, c.content) content, IFNULL(lo_c.enable, c.enable) enable')
             ->from($this->tableConfigurator)->as('c')

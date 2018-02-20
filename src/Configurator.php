@@ -88,7 +88,7 @@ class Configurator extends Control
      * @throws Exception
      * @throws \Dibi\Exception
      */
-    public function __call(string $name, array $args)
+    public function __call($name, $args)
     {
         if (!in_array($name, ['onAnchor'])) {   // exclude method
             // set method

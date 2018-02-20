@@ -94,7 +94,8 @@ class Configurator extends Control
             // set method
             if (substr($name, 0, 3) == 'set' && isset($args[0]) && isset($args[1])) {
                 $method = strtolower(substr($name, 3));
-                return $this->addData($method, $args[0], $args[1]); // insert data + return out of method
+                $this->addData($method, $args[0], $args[1]); // insert data + return out of method
+                return $args[1];
             }
 
             // load method name

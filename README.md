@@ -28,10 +28,11 @@ services:
     - Configurator(%tablePrefix%)
 ```
 
+### description
+internal combination `id_ident` and `id_locale` must by unique! type content is only like "_category_"
+
 usage:
 ```php
-use Configurator;
-
 protected function createComponentConfig(Configurator $configurator)
 {
     // disable auto create ident
@@ -50,7 +51,10 @@ $this['config']->renderText('ident');
 // return value of ident
 $this['config']->renderText('ident', true);
 
-// return value of show-web-title
+// direct return value
+$this['config']->getText('ident');
+
+// return value of show-web-title (long equivalent)
 $this['config']->renderCheckbox('show-web-title', true);
 
 // set data like translator
@@ -65,5 +69,8 @@ usage:
 
 <h1 n:if="$presenter['config']->isEnableText('web-title')">{control config:text 'web-title'}</h1>
 
+<h1 n:if="$presenter['config']->getCheckbox('show-web-title')">{control config:text 'web-title'}</h1>
+
+{* long equivalent: *}
 <h1 n:if="$presenter['config']->renderCheckbox('show-web-title', true)">{control config:text 'web-title'}</h1>
 ```

@@ -42,6 +42,8 @@ class Configurator extends Control
      * @param Connection $connection
      * @param ILocale    $locale
      * @param IStorage   $storage
+     * @throws Exception
+     * @throws Throwable
      */
     public function __construct(string $prefix, Connection $connection, ILocale $locale, IStorage $storage)
     {
@@ -76,16 +78,11 @@ class Configurator extends Control
     /**
      * Overloading is and get method.
      *
-     * use:
-     * echo: {control config:editor 'identEditor1'}
-     * return: {control config:editor 'identEditor1', true}
-     * return is enabled: $presenter['config']->isEnableEditor('identEditor1')
-     * set data: $presenter['config']->setTranslator('ident', 'text')
-     *
      * @param $name
      * @param $args
-     * @return mixed
+     * @return mixed|null
      * @throws Exception
+     * @throws Throwable
      * @throws \Dibi\Exception
      */
     public function __call($name, $args)
@@ -98,7 +95,7 @@ class Configurator extends Control
             $method = strtolower(substr($name, 6)); // load method name
             $return = (isset($args[1]) ? $args[1] : false); // load result
 
-            // set method (extended for translator)
+            // setter - set method (extended for translator)
             if (substr($name, 0, 3) == 'set' && isset($ident) && isset($args[1])) {
                 $method = strtolower(substr($name, 3));
                 $this->addData($method, $ident, $args[1]); // insert data
@@ -110,8 +107,14 @@ class Configurator extends Control
                 $method = strtolower(substr($name, 8));
                 if (isset($this->values[$method][$ident])) {
                     $block = $this->values[$method][$ident];
-                    return $block['enable'];
+                    return $block['enable'];    // return enable state
                 }
+            }
+
+            // getter - get method
+            if (substr($name, 0, 3) == 'get' && isset($ident)) {
+                $method = strtolower(substr($name, 3));     // modify name
+                $return = true;     // set only return
             }
 
             // create
@@ -128,12 +131,11 @@ class Configurator extends Control
                         return ($block[$ident]['enable'] ? $block[$ident]['content'] : null);
                     }
                     echo($block[$ident]['enable'] ? $block[$ident]['content'] : null);
-
                 } else {
-                    throw new Exception('Identification is not find: ' . $ident . '.');
+                    throw new Exception('Identification "' . $method . ':' . $ident . '" does not eixst.');
                 }
             } else {
-                throw new Exception('Invalid block. Block: ' . $method . ' is not exists.');
+                throw new Exception('Invalid block. Block: "' . $method . '" does not exists.');
             }
         }
     }
@@ -144,6 +146,8 @@ class Configurator extends Control
      *
      * @param array $values
      * @return int
+     * @throws Exception
+     * @throws Throwable
      */
     private function getIdIdentification(array $values): int
     {
@@ -163,9 +167,7 @@ class Configurator extends Control
 
         // insert new identification if not exist
         if (!$result) {
-            $result = $this->connection->insert($this->tableConfiguratorIdent, $values)
-                ->onDuplicateKeyUpdate('%a', $values)
-                ->execute(Dibi::IDENTIFIER);
+            $result = $this->connection->insert($this->tableConfiguratorIdent, $values)->execute(Dibi::IDENTIFIER);
         }
         return $result;
     }
@@ -175,34 +177,36 @@ class Configurator extends Control
      * Add data.
      *
      * @param string $type
-     * @param string $ident
+     * @param string $identification
      * @param string $content
      * @return Result|int|null
+     * @throws Exception
+     * @throws Throwable
      * @throws \Dibi\Exception
      */
-    private function addData(string $type, string $ident, string $content = '')
+    private function addData(string $type, string $identification, string $content = '')
     {
         $result = null;
-        $arr = ['ident' => $ident];
+        $arr = ['ident' => $identification];
         // load identification
-        $idIdent = $this->getIdIdentification($arr);
+        $idIdentification = $this->getIdIdentification($arr);
 
         // check exist configure id
         $conf = $this->connection->select('id')
             ->from($this->tableConfigurator)
-            ->where(['id_locale' => null, 'id_ident' => $idIdent])
+            ->where(['id_locale' => $this->idLocale, 'id_ident' => $idIdentification])
             ->fetchSingle();
 
         if (!$conf) {
             $values = [
-                'id_locale' => null,    // save without idLocale! for default values
+                'id_locale' => $this->idLocale,     // UQ 1/2
+                'id_ident'  => $idIdentification,   // UQ 2/2
                 'type'      => $type,
-                'id_ident'  => $idIdent,
-                'content'   => ($content ?: '## ' . $type . ' - ' . $ident . ' ##'),
-                'enable'    => true,
+                'content'   => ($content ?: '## ' . $type . ' - ' . $identification . ' ##'),
+                'enable'    => true,    // always enabled
             ];
-            $result = $this->connection->insert($this->tableConfigurator, $values)
-                ->execute();
+            // only insert data
+            $result = $this->connection->insert($this->tableConfigurator, $values)->execute();
 
             $this->cache->clean([
                 Cache::TAGS => ['loadData'],
@@ -214,6 +218,9 @@ class Configurator extends Control
 
     /**
      * Load data.
+     *
+     * @throws Exception
+     * @throws Throwable
      */
     private function loadData()
     {
@@ -247,16 +254,11 @@ class Configurator extends Control
      */
     public function loadDataByType(string $type): Fluent
     {
-        $result = $this->connection->select('c.id, i.ident, ' .
-            'IFNULL(lo_c.content, c.content) content, ' .
-            'IFNULL(lo_c.enable, c.enable) enable, ' .
-            'IFNULL(lo_c.id_locale, c.id_locale) id_locale')
-            ->from($this->tableConfigurator)->as('c')
-            ->join($this->tableConfiguratorIdent)->as('i')->on('i.id=c.id_ident')
-            ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=i.id')->and('lo_c.id_locale=%i', $this->idLocale)
-            ->where(['c.type' => $type, 'c.id_locale' => null])
-            ->groupBy('i.id')
-            ->orderBy('c.id_locale')->desc();
+        $result = $this->connection->select('ci.id, ci.ident, c.id_locale, c.content, c.enable')
+            ->from($this->tableConfiguratorIdent)->as('ci')
+            ->join($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')
+            ->where(['c.id_locale' => $this->idLocale, 'c.type' => $type]);
+//        $result->test();
         return $result;
     }
 }

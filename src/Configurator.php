@@ -190,12 +190,12 @@ class Configurator extends Control
         // check exist configure id
         $conf = $this->connection->select('id')
             ->from($this->tableConfigurator)
-            ->where(['id_locale' => null, 'id_ident' => $idIdent])
+            ->where(['id_locale' => $this->idLocale, 'id_ident' => $idIdent])
             ->fetchSingle();
 
         if (!$conf) {
             $values = [
-                'id_locale' => null,    // save without idLocale! for default values
+                'id_locale' => $this->idLocale,
                 'type'      => $type,
                 'id_ident'  => $idIdent,
                 'content'   => ($content ?: '## ' . $type . ' - ' . $ident . ' ##'),
@@ -247,16 +247,24 @@ class Configurator extends Control
      */
     public function loadDataByType(string $type): Fluent
     {
-        $result = $this->connection->select('c.id, i.ident, ' .
-            'IFNULL(lo_c.content, c.content) content, ' .
-            'IFNULL(lo_c.enable, c.enable) enable, ' .
-            'IFNULL(lo_c.id_locale, c.id_locale) id_locale')
-            ->from($this->tableConfigurator)->as('c')
-            ->join($this->tableConfiguratorIdent)->as('i')->on('i.id=c.id_ident')
-            ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=i.id')->and('lo_c.id_locale=%i', $this->idLocale)
-            ->where(['c.type' => $type, 'c.id_locale' => null])
-            ->groupBy('i.id')
-            ->orderBy('c.id_locale')->desc();
-        return $result;
+//        $result = $this->connection->select('c.id, i.ident, ' .
+//            'IFNULL(lo_c.content, c.content) content, ' .
+//            'IFNULL(lo_c.enable, c.enable) enable, ' .
+//            'IFNULL(lo_c.id_locale, c.id_locale) id_locale')
+//            ->from($this->tableConfigurator)->as('c')
+//            ->join($this->tableConfiguratorIdent)->as('i')->on('i.id=c.id_ident')
+//            ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=i.id')->and('lo_c.id_locale=%i', $this->idLocale)
+//            ->where(['c.type' => $type, 'c.id_locale' => null])
+//            ->groupBy('i.id')
+//            ->orderBy('c.id_locale')->desc();
+//        return $result;
+
+        $result = $this->connection->select('c.id, i.ident, ' . '')
+            ->from($this->tableConfiguratorIdent)->as('ci')
+            ->leftJoin($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')->and('c.id_locale=%i', $this->idLocale)
+            ->where(['c.type' => $type])
+            ->orderBy('c.id_locale');
+        $result->test();
+        return $result->desc();
     }
 }

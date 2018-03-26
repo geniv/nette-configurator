@@ -26,7 +26,7 @@ class Configurator extends Control
     /** @var Connection */
     private $connection;
     /** @var int */
-    private $idLocale;
+    private $idLocale, $idDefaultLocale;
     /** @var Cache */
     private $cache;
     /** @var array */
@@ -57,6 +57,7 @@ class Configurator extends Control
         $this->cache = new Cache($storage, 'cache-Configurator');
 
         $this->idLocale = $locale->getId();
+        $this->idDefaultLocale = $locale->getIdDefault();
 
         $this->loadData();  // load data
     }
@@ -159,15 +160,15 @@ class Configurator extends Control
                 ->where($values)
                 ->fetchSingle();
 
+            // insert new identification if not exist
+            if (!$result) {
+                $result = $this->connection->insert($this->tableConfiguratorIdent, $values)->execute(Dibi::IDENTIFIER);
+            }
+
             $this->cache->save($key, $result, [
                 Cache::EXPIRE => '30 minutes',
                 Cache::TAGS   => ['loadData'],
             ]);
-        }
-
-        // insert new identification if not exist
-        if (!$result) {
-            $result = $this->connection->insert($this->tableConfiguratorIdent, $values)->execute(Dibi::IDENTIFIER);
         }
         return $result;
     }
@@ -194,16 +195,16 @@ class Configurator extends Control
         // check exist configure id
         $conf = $this->connection->select('id')
             ->from($this->tableConfigurator)
-            ->where(['id_locale' => $this->idLocale, 'id_ident' => $idIdentification])
+            ->where(['id_locale' => $this->idDefaultLocale, 'id_ident' => $idIdentification])
             ->fetchSingle();
 
         if (!$conf) {
             $values = [
-                'id_locale' => $this->idLocale,     // UQ 1/2
-                'id_ident'  => $idIdentification,   // UQ 2/2
+                'id_locale' => $this->idDefaultLocale,  // UQ 1/2 - always default create language
+                'id_ident'  => $idIdentification,       // UQ 2/2
                 'type'      => $type,
                 'content'   => ($content ?: '## ' . $type . ' - ' . $identification . ' ##'),
-                'enable'    => true,    // always enabled
+                'enable'    => true,                    // always default enabled
             ];
             // only insert data
             $result = $this->connection->insert($this->tableConfigurator, $values)->execute();
@@ -254,10 +255,14 @@ class Configurator extends Control
      */
     public function loadDataByType(string $type): Fluent
     {
-        $result = $this->connection->select('ci.id, ci.ident, c.id_locale, c.content, c.enable')
+        $result = $this->connection->select('ci.id, ci.ident, ' .
+            'IFNULL(lo_c.id_locale, c.id_locale) id_locale, ' .
+            'IFNULL(lo_c.content, c.content) content, ' .
+            'IFNULL(lo_c.enable, c.enable) enable')
             ->from($this->tableConfiguratorIdent)->as('ci')
-            ->join($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')
-            ->where(['c.id_locale' => $this->idLocale, 'c.type' => $type]);
+            ->join($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')->and('c.id_locale=%i', $this->idDefaultLocale)
+            ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=ci.id')->and('lo_c.id_locale=%i', $this->idLocale)
+            ->where('%or', ['lo_c.type' => $type, 'c.type' => $type]);
 //        $result->test();
         return $result;
     }

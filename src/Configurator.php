@@ -42,6 +42,8 @@ class Configurator extends Control
      * @param Connection $connection
      * @param ILocale    $locale
      * @param IStorage   $storage
+     * @throws Exception
+     * @throws Throwable
      */
     public function __construct(string $prefix, Connection $connection, ILocale $locale, IStorage $storage)
     {
@@ -87,6 +89,7 @@ class Configurator extends Control
      * @return mixed
      * @throws Exception
      * @throws \Dibi\Exception
+     * @throws Throwable
      */
     public function __call($name, $args)
     {
@@ -144,6 +147,8 @@ class Configurator extends Control
      *
      * @param array $values
      * @return int
+     * @throws Exception
+     * @throws Throwable
      */
     private function getIdIdentification(array $values): int
     {
@@ -178,6 +183,8 @@ class Configurator extends Control
      * @param string $ident
      * @param string $content
      * @return Result|int|null
+     * @throws Exception
+     * @throws Throwable
      * @throws \Dibi\Exception
      */
     private function addData(string $type, string $ident, string $content = '')
@@ -214,6 +221,9 @@ class Configurator extends Control
 
     /**
      * Load data.
+     *
+     * @throws Exception
+     * @throws Throwable
      */
     private function loadData()
     {

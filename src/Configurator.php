@@ -271,10 +271,9 @@ class Configurator extends Control
 
         $result = $this->connection->select('c.id, i.ident, ' . '')
             ->from($this->tableConfiguratorIdent)->as('ci')
-            ->leftJoin($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')->and('c.id_locale=%i', $this->idLocale)
-            ->where(['c.type' => $type])
-            ->orderBy('c.id_locale');
+            ->join($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')
+            ->where(['c.id_locale=%i', $this->idLocale, 'c.type' => $type]);
         $result->test();
-        return $result->desc();
+        return $result;
     }
 }

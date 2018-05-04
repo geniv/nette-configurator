@@ -199,6 +199,7 @@ class Configurator extends Control
             ->fetchSingle();
 
         if (!$conf) {
+            // insert data
             $values = [
                 'id_locale' => $this->idDefaultLocale,  // UQ 1/2 - always default create language
                 'id_ident'  => $idIdentification,       // UQ 2/2
@@ -208,6 +209,13 @@ class Configurator extends Control
             ];
             // only insert data
             $result = $this->connection->insert($this->tableConfigurator, $values)->execute();
+
+            $this->cache->clean([
+                Cache::TAGS => ['loadData'],
+            ]);
+        } else {
+            // update data
+            $result = $this->connection->update($this->tableConfigurator, ['content' => $content])->where(['id' => $conf])->execute();
 
             $this->cache->clean([
                 Cache::TAGS => ['loadData'],

@@ -59,6 +59,8 @@ $this['config']->renderCheckbox('show-web-title', true);
 
 // set data like translator
 $presenter['config']->setTranslator('ident', 'text');
+
+$this['config']->setEditor('ident', 'new text');
 ```
 
 usage:

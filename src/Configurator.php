@@ -54,7 +54,7 @@ class Configurator extends Control
         $this->tableConfiguratorIdent = $prefix . self::TABLE_NAME_IDENT;
 
         $this->connection = $connection;
-        $this->cache = new Cache($storage, 'cache-Configurator');
+        $this->cache = new Cache($storage, 'Configurator');
 
         $this->idLocale = $locale->getId();
         $this->idDefaultLocale = $locale->getIdDefault();

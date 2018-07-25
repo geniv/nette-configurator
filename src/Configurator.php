@@ -13,7 +13,7 @@ use Nette\Caching\IStorage;
  *
  * @author  geniv
  */
-class Configurator extends Control implements IConfiguration
+class Configurator extends Control implements IConfigurator
 {
     // define constant table names
     const

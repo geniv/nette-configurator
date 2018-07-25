@@ -39,13 +39,13 @@ interface IConfigurator
 
 
     /**
-     * Get data by type by id.
+     * Get data.
      *
-     * @param string $type
-     * @param int    $id
+     * @param int $id
+     * @param int $idLocale
      * @return array
      */
-    public function getDataByTypeById(string $type, int $id): array;
+    public function getData(int $id, int $idLocale = 0): array;
 
 
     /**

@@ -58,7 +58,7 @@ class Configurator extends Control implements IConfigurator
         $this->idLocale = $locale->getId();
         $this->idDefaultLocale = $locale->getIdDefault();
 
-        $this->getData();  // load data
+        $this->getInternalData();  // load data
     }
 
 
@@ -120,7 +120,7 @@ class Configurator extends Control implements IConfigurator
             // create
             if ($this->autoCreate && (!isset($this->values[$method]) || !isset($this->values[$method][$ident]))) {
                 $this->addData($method, $ident);    // insert
-                $this->getData();                  // reloading
+                $this->getInternalData();                  // reloading
             }
 
             // load value
@@ -226,10 +226,11 @@ class Configurator extends Control implements IConfigurator
     /**
      * Get data.
      *
+     * @internal
      * @throws Exception
      * @throws Throwable
      */
-    private function getData()
+    private function getInternalData()
     {
         $values = $this->cache->load('values' . $this->idLocale);
         if ($values === null) {
@@ -258,7 +259,7 @@ class Configurator extends Control implements IConfigurator
      */
     public function getListDataByType(string $type): Fluent
     {
-        $result = $this->connection->select('ci.id, ci.ident, ' .
+        $result = $this->connection->select('c.id, c.id_ident, ci.ident, ' .
             'IFNULL(lo_c.id_locale, c.id_locale) id_locale, ' .
             'IFNULL(lo_c.content, c.content) content, ' .
             'IFNULL(lo_c.enable, c.enable) enable')
@@ -303,15 +304,17 @@ class Configurator extends Control implements IConfigurator
 
 
     /**
-     * Get data by type by id.
+     * Get data.
      *
-     * @param string $type
-     * @param int    $id
+     * @param int $id
+     * @param int $idLocale
      * @return array
      */
-    public function getDataByTypeById(string $type, int $id): array
+    public function getData(int $id, int $idLocale = 0): array
     {
-        $result = $this->getListDataByType($type)
+        $result = $this->connection->select('c.id, c.id_locale, c.id_ident, ci.ident, c.type, c.content, c.enable, c.added')
+            ->from($this->tableConfigurator)->as('c')
+            ->join($this->tableConfiguratorIdent)->as('ci')->on('ci.id=c.id_ident')->and(['c.id_locale' => $idLocale ?: $this->idDefaultLocale])
             ->where(['c.id' => $id]);
 //        $result->test();
         return (array) $result->fetch();

@@ -3,7 +3,6 @@
 use Dibi\Fluent;
 use Nette\Application\UI\Control;
 use Dibi\Connection;
-use Dibi\Result;
 use Locale\ILocale;
 use Nette\Caching\Cache;
 use Nette\Caching\IStorage;
@@ -170,7 +169,7 @@ class Configurator extends Control
                 Cache::TAGS   => ['loadData'],
             ]);
         }
-        return $result;
+        return (int) $result;
     }
 
 
@@ -180,12 +179,11 @@ class Configurator extends Control
      * @param string $type
      * @param string $identification
      * @param string $content
-     * @return Result|int|null
-     * @throws Exception
+     * @return int
      * @throws Throwable
      * @throws \Dibi\Exception
      */
-    private function addData(string $type, string $identification, string $content = '')
+    private function addData(string $type, string $identification, string $content = ''): int
     {
         $result = null;
         $arr = ['ident' => $identification];
@@ -221,7 +219,7 @@ class Configurator extends Control
                 Cache::TAGS => ['loadData'],
             ]);
         }
-        return $result;
+        return (int) $result;
     }
 
 
@@ -270,8 +268,40 @@ class Configurator extends Control
             ->from($this->tableConfiguratorIdent)->as('ci')
             ->join($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')->and(['c.id_locale' => $this->idDefaultLocale])
             ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=ci.id')->and(['lo_c.id_locale' => $this->idLocale])
-            ->where('%or', ['lo_c.type' => $type, 'c.type' => $type]);
+            ->where('(%or)', ['lo_c.type' => $type, 'c.type' => $type]);
 //        $result->test();
         return $result;
+    }
+
+
+    /**
+     * Load data by type by id.
+     *
+     * @param string $type
+     * @param int    $id
+     * @return array
+     */
+    public function loadDataByTypeById(string $type, int $id): array
+    {
+        $result = $this->loadDataByType($type)
+            ->where(['c.id' => $id]);
+//        $result->test();
+        return (array) $result->fetch();
+    }
+
+
+    /**
+     * Delete data.
+     *
+     * @param int $id
+     * @return int
+     * @throws \Dibi\Exception
+     */
+    public function deleteData(int $id): int
+    {
+        $result = $this->connection->delete($this->tableConfigurator)
+            ->where(['id' => $id]);
+//        $result->test();
+        return (int) $result->execute();
     }
 }

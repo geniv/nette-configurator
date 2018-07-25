@@ -3,7 +3,6 @@
 use Dibi\Fluent;
 use Nette\Application\UI\Control;
 use Dibi\Connection;
-use Dibi\Result;
 use Locale\ILocale;
 use Nette\Caching\Cache;
 use Nette\Caching\IStorage;
@@ -14,7 +13,7 @@ use Nette\Caching\IStorage;
  *
  * @author  geniv
  */
-class Configurator extends Control
+class Configurator extends Control implements IConfiguration
 {
     // define constant table names
     const
@@ -54,12 +53,12 @@ class Configurator extends Control
         $this->tableConfiguratorIdent = $prefix . self::TABLE_NAME_IDENT;
 
         $this->connection = $connection;
-        $this->cache = new Cache($storage, 'cache-Configurator');
+        $this->cache = new Cache($storage, 'Configurator');
 
         $this->idLocale = $locale->getId();
         $this->idDefaultLocale = $locale->getIdDefault();
 
-        $this->loadData();  // load data
+        $this->getData();  // load data
     }
 
 
@@ -121,7 +120,7 @@ class Configurator extends Control
             // create
             if ($this->autoCreate && (!isset($this->values[$method]) || !isset($this->values[$method][$ident]))) {
                 $this->addData($method, $ident);    // insert
-                $this->loadData();                  // reloading
+                $this->getData();                  // reloading
             }
 
             // load value
@@ -170,7 +169,7 @@ class Configurator extends Control
                 Cache::TAGS   => ['loadData'],
             ]);
         }
-        return $result;
+        return (int) $result;
     }
 
 
@@ -180,12 +179,11 @@ class Configurator extends Control
      * @param string $type
      * @param string $identification
      * @param string $content
-     * @return Result|int|null
-     * @throws Exception
+     * @return int
      * @throws Throwable
      * @throws \Dibi\Exception
      */
-    private function addData(string $type, string $identification, string $content = '')
+    private function addData(string $type, string $identification, string $content = ''): int
     {
         $result = null;
         $arr = ['ident' => $identification];
@@ -221,28 +219,25 @@ class Configurator extends Control
                 Cache::TAGS => ['loadData'],
             ]);
         }
-        return $result;
+        return (int) $result;
     }
 
 
     /**
-     * Load data.
+     * Get data.
      *
      * @throws Exception
      * @throws Throwable
      */
-    private function loadData()
+    private function getData()
     {
         $values = $this->cache->load('values' . $this->idLocale);
         if ($values === null) {
-            $types = $this->connection->select('id, type')
-                ->from($this->tableConfigurator)
-                ->groupBy('type')
-                ->fetchPairs('id', 'type');
+            $types = $this->getListType();
 
             // load rows by type
             foreach ($types as $type) {
-                $items = $this->loadDataByType($type);
+                $items = $this->getListDataByType($type);
                 $values[$type] = $items->fetchAssoc('ident');
             }
 
@@ -256,12 +251,12 @@ class Configurator extends Control
 
 
     /**
-     * Load data by type.
+     * Get list data by type.
      *
      * @param string $type
      * @return Fluent
      */
-    public function loadDataByType(string $type): Fluent
+    public function getListDataByType(string $type): Fluent
     {
         $result = $this->connection->select('ci.id, ci.ident, ' .
             'IFNULL(lo_c.id_locale, c.id_locale) id_locale, ' .
@@ -270,8 +265,71 @@ class Configurator extends Control
             ->from($this->tableConfiguratorIdent)->as('ci')
             ->join($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')->and(['c.id_locale' => $this->idDefaultLocale])
             ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=ci.id')->and(['lo_c.id_locale' => $this->idLocale])
-            ->where('%or', ['lo_c.type' => $type, 'c.type' => $type]);
+            ->where('(%or)', ['lo_c.type' => $type, 'c.type' => $type]);
 //        $result->test();
         return $result;
+    }
+
+
+    /**
+     * Get list type.
+     *
+     * @return array
+     */
+    public function getListType(): array
+    {
+        return $this->connection->select('id, type')
+            ->from($this->tableConfigurator)
+            ->groupBy('type')
+            ->orderBy(['type' => 'ASC'])
+            ->fetchPairs('id', 'type');
+    }
+
+
+    /**
+     * Delete type.
+     *
+     * @param string $type
+     * @return int
+     * @throws \Dibi\Exception
+     */
+    public function deleteType(string $type): int
+    {
+        $result = $this->connection->delete($this->tableConfigurator)
+            ->where(['type' => $type]);
+//        $result->test();
+        return (int) $result->execute();
+    }
+
+
+    /**
+     * Get data by type by id.
+     *
+     * @param string $type
+     * @param int    $id
+     * @return array
+     */
+    public function getDataByTypeById(string $type, int $id): array
+    {
+        $result = $this->getListDataByType($type)
+            ->where(['c.id' => $id]);
+//        $result->test();
+        return (array) $result->fetch();
+    }
+
+
+    /**
+     * Delete data.
+     *
+     * @param int $id
+     * @return int
+     * @throws \Dibi\Exception
+     */
+    public function deleteData(int $id): int
+    {
+        $result = $this->connection->delete($this->tableConfigurator)
+            ->where(['id' => $id]);
+//        $result->test();
+        return (int) $result->execute();
     }
 }

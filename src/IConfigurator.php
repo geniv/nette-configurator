@@ -4,11 +4,11 @@ use Dibi\Fluent;
 
 
 /**
- * Interface IConfiguration
+ * Interface IConfigurator
  *
  * @author  geniv
  */
-interface IConfiguration
+interface IConfigurator
 {
 
     /**

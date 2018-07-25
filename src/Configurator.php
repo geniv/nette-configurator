@@ -262,13 +262,27 @@ class Configurator extends Control implements IConfigurator
         $result = $this->connection->select('c.id, c.id_ident, ci.ident, ' .
             'IFNULL(lo_c.id_locale, c.id_locale) id_locale, ' .
             'IFNULL(lo_c.content, c.content) content, ' .
-            'IFNULL(lo_c.enable, c.enable) enable')
+            'IFNULL(lo_c.enable, c.enable) enable, ' .
+            'c.added')
             ->from($this->tableConfiguratorIdent)->as('ci')
             ->join($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')->and(['c.id_locale' => $this->idDefaultLocale])
             ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=ci.id')->and(['lo_c.id_locale' => $this->idLocale])
             ->where('(%or)', ['lo_c.type' => $type, 'c.type' => $type]);
 //        $result->test();
         return $result;
+    }
+
+
+    /**
+     * Get list ident.
+     *
+     * @return array
+     */
+    public function getListIdent(): array
+    {
+        return $this->connection->select('id, ident')
+            ->from($this->tableConfiguratorIdent)
+            ->fetchPairs('id', 'ident');
     }
 
 

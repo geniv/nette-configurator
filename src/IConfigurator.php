@@ -12,6 +12,14 @@ interface IConfigurator
 {
 
     /**
+     * Get list ident.
+     *
+     * @return array
+     */
+    public function getListIdent(): array;
+
+
+    /**
      * Get list type.
      *
      * @return array

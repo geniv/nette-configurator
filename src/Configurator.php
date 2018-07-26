@@ -58,7 +58,7 @@ class Configurator extends Control implements IConfigurator
         $this->idLocale = $locale->getId();
         $this->idDefaultLocale = $locale->getIdDefault();
 
-        $this->getData();  // load data
+        $this->getInternalData();  // load data
     }
 
 
@@ -98,7 +98,7 @@ class Configurator extends Control implements IConfigurator
             // setter - set method (extended for translator)
             if (substr($name, 0, 3) == 'set' && isset($ident) && isset($args[1])) {
                 $method = strtolower(substr($name, 3));
-                $this->addData($method, $ident, $args[1]); // insert data
+                $this->addInternalData($method, $ident, $args[1]); // insert data
                 return $args[1];    // return message only by create new translate
             }
 
@@ -119,8 +119,8 @@ class Configurator extends Control implements IConfigurator
 
             // create
             if ($this->autoCreate && (!isset($this->values[$method]) || !isset($this->values[$method][$ident]))) {
-                $this->addData($method, $ident);    // insert
-                $this->getData();                  // reloading
+                $this->addInternalData($method, $ident);    // insert
+                $this->getInternalData();                  // reloading
             }
 
             // load value
@@ -176,6 +176,7 @@ class Configurator extends Control implements IConfigurator
     /**
      * Add data.
      *
+     * @internal
      * @param string $type
      * @param string $identification
      * @param string $content
@@ -183,7 +184,7 @@ class Configurator extends Control implements IConfigurator
      * @throws Throwable
      * @throws \Dibi\Exception
      */
-    private function addData(string $type, string $identification, string $content = ''): int
+    private function addInternalData(string $type, string $identification, string $content = ''): int
     {
         $result = null;
         $arr = ['ident' => $identification];
@@ -226,10 +227,11 @@ class Configurator extends Control implements IConfigurator
     /**
      * Get data.
      *
+     * @internal
      * @throws Exception
      * @throws Throwable
      */
-    private function getData()
+    private function getInternalData()
     {
         $values = $this->cache->load('values' . $this->idLocale);
         if ($values === null) {
@@ -258,16 +260,30 @@ class Configurator extends Control implements IConfigurator
      */
     public function getListDataByType(string $type): Fluent
     {
-        $result = $this->connection->select('ci.id, ci.ident, ' .
+        $result = $this->connection->select('c.id, c.id_ident, ci.ident, ' .
             'IFNULL(lo_c.id_locale, c.id_locale) id_locale, ' .
             'IFNULL(lo_c.content, c.content) content, ' .
-            'IFNULL(lo_c.enable, c.enable) enable')
+            'IFNULL(lo_c.enable, c.enable) enable, ' .
+            'c.added')
             ->from($this->tableConfiguratorIdent)->as('ci')
             ->join($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')->and(['c.id_locale' => $this->idDefaultLocale])
             ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=ci.id')->and(['lo_c.id_locale' => $this->idLocale])
             ->where('(%or)', ['lo_c.type' => $type, 'c.type' => $type]);
 //        $result->test();
         return $result;
+    }
+
+
+    /**
+     * Get list ident.
+     *
+     * @return array
+     */
+    public function getListIdent(): array
+    {
+        return $this->connection->select('id, ident')
+            ->from($this->tableConfiguratorIdent)
+            ->fetchPairs('id', 'ident');
     }
 
 
@@ -303,18 +319,51 @@ class Configurator extends Control implements IConfigurator
 
 
     /**
-     * Get data by type by id.
+     * Get data.
      *
-     * @param string $type
-     * @param int    $id
+     * @param int $id
+     * @param int $idLocale
      * @return array
      */
-    public function getDataByTypeById(string $type, int $id): array
+    public function getData(int $id, int $idLocale = 0): array
     {
-        $result = $this->getListDataByType($type)
+        $result = $this->connection->select('c.id, c.id_locale, c.id_ident, ci.ident, c.type, c.content, c.enable, c.added')
+            ->from($this->tableConfigurator)->as('c')
+            ->join($this->tableConfiguratorIdent)->as('ci')->on('ci.id=c.id_ident')->and(['c.id_locale' => $idLocale ?: $this->idDefaultLocale])
             ->where(['c.id' => $id]);
 //        $result->test();
         return (array) $result->fetch();
+    }
+
+
+    /**
+     * Add data.
+     *
+     * @param array $values
+     * @return int
+     * @throws \Dibi\Exception
+     */
+    public function addData(array $values): int
+    {
+        $values['added%sql'] = 'NOW()';
+        $result = $this->connection->insert($this->tableConfigurator, $values);
+        return (int) $result->execute();
+    }
+
+
+    /**
+     * Edit data.
+     *
+     * @param int   $id
+     * @param array $values
+     * @return int
+     * @throws \Dibi\Exception
+     */
+    public function editData(int $id, array $values): int
+    {
+        $result = $this->connection->update($this->tableConfigurator, $values)
+            ->where(['id' => $id]);
+        return (int) $result->execute();
     }
 
 

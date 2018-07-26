@@ -12,6 +12,14 @@ interface IConfigurator
 {
 
     /**
+     * Get list ident.
+     *
+     * @return array
+     */
+    public function getListIdent(): array;
+
+
+    /**
      * Get list type.
      *
      * @return array
@@ -39,13 +47,34 @@ interface IConfigurator
 
 
     /**
-     * Get data by type by id.
+     * Get data.
      *
-     * @param string $type
-     * @param int    $id
+     * @param int $id
+     * @param int $idLocale
      * @return array
      */
-    public function getDataByTypeById(string $type, int $id): array;
+    public function getData(int $id, int $idLocale = 0): array;
+
+
+    /**
+     * Add data.
+     *
+     * @param array $values
+     * @return int
+     * @throws \Dibi\Exception
+     */
+    public function addData(array $values): int;
+
+
+    /**
+     * Edit data.
+     *
+     * @param int   $id
+     * @param array $values
+     * @return int
+     * @throws \Dibi\Exception
+     */
+    public function editData(int $id, array $values): int;
 
 
     /**

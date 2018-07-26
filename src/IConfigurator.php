@@ -57,6 +57,27 @@ interface IConfigurator
 
 
     /**
+     * Add data.
+     *
+     * @param array $values
+     * @return int
+     * @throws \Dibi\Exception
+     */
+    public function addData(array $values): int;
+
+
+    /**
+     * Edit data.
+     *
+     * @param int   $id
+     * @param array $values
+     * @return int
+     * @throws \Dibi\Exception
+     */
+    public function editData(int $id, array $values): int;
+
+
+    /**
      * Delete data.
      *
      * @param int $id

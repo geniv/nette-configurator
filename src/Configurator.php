@@ -98,7 +98,7 @@ class Configurator extends Control implements IConfigurator
             // setter - set method (extended for translator)
             if (substr($name, 0, 3) == 'set' && isset($ident) && isset($args[1])) {
                 $method = strtolower(substr($name, 3));
-                $this->addData($method, $ident, $args[1]); // insert data
+                $this->addInternalData($method, $ident, $args[1]); // insert data
                 return $args[1];    // return message only by create new translate
             }
 
@@ -119,7 +119,7 @@ class Configurator extends Control implements IConfigurator
 
             // create
             if ($this->autoCreate && (!isset($this->values[$method]) || !isset($this->values[$method][$ident]))) {
-                $this->addData($method, $ident);    // insert
+                $this->addInternalData($method, $ident);    // insert
                 $this->getInternalData();                  // reloading
             }
 
@@ -176,6 +176,7 @@ class Configurator extends Control implements IConfigurator
     /**
      * Add data.
      *
+     * @internal
      * @param string $type
      * @param string $identification
      * @param string $content
@@ -183,7 +184,7 @@ class Configurator extends Control implements IConfigurator
      * @throws Throwable
      * @throws \Dibi\Exception
      */
-    private function addData(string $type, string $identification, string $content = ''): int
+    private function addInternalData(string $type, string $identification, string $content = ''): int
     {
         $result = null;
         $arr = ['ident' => $identification];
@@ -332,6 +333,37 @@ class Configurator extends Control implements IConfigurator
             ->where(['c.id' => $id]);
 //        $result->test();
         return (array) $result->fetch();
+    }
+
+
+    /**
+     * Add data.
+     *
+     * @param array $values
+     * @return int
+     * @throws \Dibi\Exception
+     */
+    public function addData(array $values): int
+    {
+        $values['added%sql'] = 'NOW()';
+        $result = $this->connection->insert($this->tableConfigurator, $values);
+        return (int) $result->execute();
+    }
+
+
+    /**
+     * Edit data.
+     *
+     * @param int   $id
+     * @param array $values
+     * @return int
+     * @throws \Dibi\Exception
+     */
+    public function editData(int $id, array $values): int
+    {
+        $result = $this->connection->update($this->tableConfigurator, $values)
+            ->where(['id' => $id]);
+        return (int) $result->execute();
     }
 
 

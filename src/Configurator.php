@@ -246,7 +246,7 @@ class Configurator extends Control implements IConfigurator
     {
         $values = $this->cache->load('values' . $this->idLocale);
         if ($values === null) {
-            $types = $this->getListType();
+            $types = $this->getListDataType();
 
             // load rows by type
             foreach ($types as $type) {
@@ -296,6 +296,21 @@ class Configurator extends Control implements IConfigurator
     }
 
 
+    /**
+     * Get list data type.
+     *
+     * @return array
+     */
+    public function getListDataType(): array
+    {
+        return $this->connection->select('id, type')
+            ->from($this->tableConfigurator)
+            ->groupBy('type')
+            ->orderBy(['type' => 'ASC'])
+            ->fetchPairs('id', 'type');
+    }
+
+
 //    /**
 //     * Get list ident.
 //     *
@@ -307,21 +322,6 @@ class Configurator extends Control implements IConfigurator
 //            ->from($this->tableConfiguratorIdent)
 //            ->fetchPairs('id', 'ident');
 //    }
-
-
-    /**
-     * Get list type.
-     *
-     * @return array
-     */
-    public function getListType(): array
-    {
-        return $this->connection->select('id, type')
-            ->from($this->tableConfigurator)
-            ->groupBy('type')
-            ->orderBy(['type' => 'ASC'])
-            ->fetchPairs('id', 'type');
-    }
 
 
 //    /**

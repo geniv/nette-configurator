@@ -19,14 +19,6 @@ interface IConfigurator
 //    public function getListIdent(): array;
 
 
-    /**
-     * Get list type.
-     *
-     * @return array
-     */
-    public function getListType(): array;
-
-
 //    /**
 //     * Delete type.
 //     *
@@ -52,6 +44,14 @@ interface IConfigurator
      * @return Fluent
      */
     public function getListDataByType(string $type): Fluent;
+
+
+    /**
+     * Get list data type.
+     *
+     * @return array
+     */
+    public function getListDataType(): array;
 
 
 //    /**

@@ -11,12 +11,12 @@ use Dibi\Fluent;
 interface IConfigurator
 {
 
-    /**
-     * Get list ident.
-     *
-     * @return array
-     */
-    public function getListIdent(): array;
+//    /**
+//     * Get list ident.
+//     *
+//     * @return array
+//     */
+//    public function getListIdent(): array;
 
 
     /**
@@ -27,14 +27,22 @@ interface IConfigurator
     public function getListType(): array;
 
 
+//    /**
+//     * Delete type.
+//     *
+//     * @param string $type
+//     * @return int
+//     * @throws \Dibi\Exception
+//     */
+//    public function deleteType(string $type): int;
+
+
     /**
-     * Delete type.
+     * Get list data.
      *
-     * @param string $type
-     * @return int
-     * @throws \Dibi\Exception
+     * @return Fluent
      */
-    public function deleteType(string $type): int;
+    public function getListData(): Fluent;
 
 
     /**
@@ -46,43 +54,43 @@ interface IConfigurator
     public function getListDataByType(string $type): Fluent;
 
 
-    /**
-     * Get data.
-     *
-     * @param int $id
-     * @param int $idLocale
-     * @return array
-     */
-    public function getData(int $id, int $idLocale = 0): array;
+//    /**
+//     * Get data.
+//     *
+//     * @param int $id
+//     * @param int $idLocale
+//     * @return array
+//     */
+//    public function getData(int $id, int $idLocale = 0): array;
 
 
-    /**
-     * Add data.
-     *
-     * @param array $values
-     * @return int
-     * @throws \Dibi\Exception
-     */
-    public function addData(array $values): int;
+//    /**
+//     * Add data.
+//     *
+//     * @param array $values
+//     * @return int
+//     * @throws \Dibi\Exception
+//     */
+//    public function addData(array $values): int;
 
 
-    /**
-     * Edit data.
-     *
-     * @param int   $id
-     * @param array $values
-     * @return int
-     * @throws \Dibi\Exception
-     */
-    public function editData(int $id, array $values): int;
+//    /**
+//     * Edit data.
+//     *
+//     * @param int   $id
+//     * @param array $values
+//     * @return int
+//     * @throws \Dibi\Exception
+//     */
+//    public function editData(int $id, array $values): int;
 
 
-    /**
-     * Delete data.
-     *
-     * @param int $id
-     * @return int
-     * @throws \Dibi\Exception
-     */
-    public function deleteData(int $id): int;
+//    /**
+//     * Delete data.
+//     *
+//     * @param int $id
+//     * @return int
+//     * @throws \Dibi\Exception
+//     */
+//    public function deleteData(int $id): int;
 }

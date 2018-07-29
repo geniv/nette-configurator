@@ -15,11 +15,6 @@ use Nette\Caching\IStorage;
  */
 class Configurator extends Control implements IConfigurator
 {
-    // define constant table names
-    const
-        TABLE_NAME = 'configurator',
-        TABLE_NAME_IDENT = 'configurator_ident';
-
     /** @var string */
     private $tableConfigurator, $tableConfiguratorIdent;
     /** @var Connection */
@@ -370,33 +365,33 @@ class Configurator extends Control implements IConfigurator
 //    }
 
 
-//    /**
-//     * Edit data.
-//     *
-//     * @param int   $id
-//     * @param array $values
-//     * @return int
-//     * @throws \Dibi\Exception
-//     */
-//    public function editData(int $id, array $values): int
-//    {
-//        $result = $this->connection->update($this->tableConfigurator, $values)
-//            ->where(['id' => $id]);
-//        return (int) $result->execute();
-//    }
+    /**
+     * Edit data.
+     *
+     * @param int   $id
+     * @param array $values
+     * @return int
+     * @throws \Dibi\Exception
+     */
+    public function editData(int $id, array $values): int
+    {
+        $result = $this->connection->update($this->tableConfigurator, $values)
+            ->where(['id' => $id]);
+        return (int) $result->execute();
+    }
 
 
-//    /**
-//     * Delete data.
-//     *
-//     * @param int $id
-//     * @return int
-//     * @throws \Dibi\Exception
-//     */
-//    public function deleteData(int $id): int
-//    {
-//        $result = $this->connection->delete($this->tableConfigurator)
-//            ->where(['id' => $id]);
-//        return (int) $result->execute();
-//    }
+    /**
+     * Delete data.
+     *
+     * @param int $id
+     * @return int
+     * @throws \Dibi\Exception
+     */
+    public function deleteData(int $id): int
+    {
+        $result = $this->connection->delete($this->tableConfigurator)
+            ->where(['id' => $id]);
+        return (int) $result->execute();
+    }
 }

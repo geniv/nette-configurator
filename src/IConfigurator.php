@@ -11,12 +11,12 @@ use Dibi\Fluent;
 interface IConfigurator
 {
 
-//    /**
-//     * Get list ident.
-//     *
-//     * @return array
-//     */
-//    public function getListIdent(): array;
+    /**
+     * Get list ident.
+     *
+     * @return array
+     */
+    public function getListIdent(): array;
 
 
 //    /**

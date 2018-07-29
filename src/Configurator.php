@@ -328,17 +328,17 @@ class Configurator extends Control implements IConfigurator
     }
 
 
-//    /**
-//     * Get list ident.
-//     *
-//     * @return array
-//     */
-//    public function getListIdent(): array
-//    {
-//        return $this->connection->select('id, ident')
-//            ->from($this->tableConfiguratorIdent)
-//            ->fetchPairs('id', 'ident');
-//    }
+    /**
+     * Get list ident.
+     *
+     * @return array
+     */
+    public function getListIdent(): array
+    {
+        return $this->connection->select('id, ident')
+            ->from($this->tableConfiguratorIdent)
+            ->fetchPairs('id', 'ident');
+    }
 
 
 //    /**

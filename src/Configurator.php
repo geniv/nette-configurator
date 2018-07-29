@@ -263,8 +263,7 @@ class Configurator extends Control implements IConfigurator
         $result = $this->connection->select('c.id, c.id_ident, ci.ident, ' .
             'IFNULL(lo_c.id_locale, c.id_locale) id_locale, ' .
             'IFNULL(lo_c.content, c.content) content, ' .
-            'IFNULL(lo_c.enable, c.enable) enable, ' .
-            'c.added')
+            'IFNULL(lo_c.enable, c.enable) enable')
             ->from($this->tableConfiguratorIdent)->as('ci')
             ->join($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')->and(['c.id_locale' => $this->idDefaultLocale])
             ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=ci.id')->and(['lo_c.id_locale' => $this->idLocale])
@@ -327,7 +326,7 @@ class Configurator extends Control implements IConfigurator
      */
     public function getData(int $id, int $idLocale = 0): array
     {
-        $result = $this->connection->select('c.id, c.id_locale, c.id_ident, ci.ident, c.type, c.content, c.enable, c.added')
+        $result = $this->connection->select('c.id, c.id_locale, c.id_ident, ci.ident, c.type, c.content, c.enable')
             ->from($this->tableConfigurator)->as('c')
             ->join($this->tableConfiguratorIdent)->as('ci')->on('ci.id=c.id_ident')->and(['c.id_locale' => $idLocale ?: $this->idDefaultLocale])
             ->where(['c.id' => $id]);
@@ -345,7 +344,6 @@ class Configurator extends Control implements IConfigurator
      */
     public function addData(array $values): int
     {
-        $values['added%sql'] = 'NOW()';
         $result = $this->connection->insert($this->tableConfigurator, $values);
         return (int) $result->execute();
     }

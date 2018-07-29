@@ -54,14 +54,14 @@ interface IConfigurator
     public function getListDataType(): array;
 
 
-//    /**
-//     * Get data.
-//     *
-//     * @param int $id
-//     * @param int $idLocale
-//     * @return array
-//     */
-//    public function getData(int $id, int $idLocale = 0): array;
+    /**
+     * Get data by id.
+     *
+     * @param int $id
+     * @param int $idLocale
+     * @return array
+     */
+    public function getDataById(int $id, int $idLocale = 0): array;
 
 
 //    /**

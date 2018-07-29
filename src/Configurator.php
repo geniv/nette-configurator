@@ -311,6 +311,23 @@ class Configurator extends Control implements IConfigurator
     }
 
 
+    /**
+     * Get data by id.
+     *
+     * @param int $id
+     * @param int $idLocale
+     * @return array
+     */
+    public function getDataById(int $id, int $idLocale = 0): array
+    {
+        $result = $this->connection->select('c.id, c.id_locale, c.id_ident, ci.ident, c.type, c.content, c.enable')
+            ->from($this->tableConfigurator)->as('c')
+            ->join($this->tableConfiguratorIdent)->as('ci')->on('ci.id=c.id_ident')->and(['c.id_locale' => $idLocale ?: $this->idDefaultLocale])
+            ->where(['c.id' => $id]);
+        return (array) $result->fetch();
+    }
+
+
 //    /**
 //     * Get list ident.
 //     *
@@ -336,23 +353,6 @@ class Configurator extends Control implements IConfigurator
 //        $result = $this->connection->delete($this->tableConfigurator)
 //            ->where(['type' => $type]);
 //        return (int) $result->execute();
-//    }
-
-
-//    /**
-//     * Get data.
-//     *
-//     * @param int $id
-//     * @param int $idLocale
-//     * @return array
-//     */
-//    public function getData(int $id, int $idLocale = 0): array
-//    {
-//        $result = $this->connection->select('c.id, c.id_locale, c.id_ident, ci.ident, c.type, c.content, c.enable')
-//            ->from($this->tableConfigurator)->as('c')
-//            ->join($this->tableConfiguratorIdent)->as('ci')->on('ci.id=c.id_ident')->and(['c.id_locale' => $idLocale ?: $this->idDefaultLocale])
-//            ->where(['c.id' => $id]);
-//        return (array) $result->fetch();
 //    }
 
 

@@ -98,4 +98,10 @@ interface IConfigurator
      * @throws \Dibi\Exception
      */
     public function deleteData(int $id): int;
+
+
+    /**
+     * Clean cache.
+     */
+    public function cleanCache();
 }

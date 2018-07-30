@@ -10,6 +10,11 @@ use Dibi\Fluent;
  */
 interface IConfigurator
 {
+    // define constant table names
+    const
+        TABLE_NAME = 'configurator',
+        TABLE_NAME_IDENT = 'configurator_ident';
+
 
     /**
      * Get list ident.
@@ -19,22 +24,22 @@ interface IConfigurator
     public function getListIdent(): array;
 
 
-    /**
-     * Get list type.
-     *
-     * @return array
-     */
-    public function getListType(): array;
+//    /**
+//     * Delete type.
+//     *
+//     * @param string $type
+//     * @return int
+//     * @throws \Dibi\Exception
+//     */
+//    public function deleteType(string $type): int;
 
 
     /**
-     * Delete type.
+     * Get list data.
      *
-     * @param string $type
-     * @return int
-     * @throws \Dibi\Exception
+     * @return Fluent
      */
-    public function deleteType(string $type): int;
+    public function getListData(): Fluent;
 
 
     /**
@@ -47,23 +52,31 @@ interface IConfigurator
 
 
     /**
-     * Get data.
+     * Get list data type.
+     *
+     * @return array
+     */
+    public function getListDataType(): array;
+
+
+    /**
+     * Get data by id.
      *
      * @param int $id
      * @param int $idLocale
      * @return array
      */
-    public function getData(int $id, int $idLocale = 0): array;
+    public function getDataById(int $id, int $idLocale = 0): array;
 
 
-    /**
-     * Add data.
-     *
-     * @param array $values
-     * @return int
-     * @throws \Dibi\Exception
-     */
-    public function addData(array $values): int;
+//    /**
+//     * Add data.
+//     *
+//     * @param array $values
+//     * @return int
+//     * @throws \Dibi\Exception
+//     */
+//    public function addData(array $values): int;
 
 
     /**

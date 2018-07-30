@@ -15,11 +15,6 @@ use Nette\Caching\IStorage;
  */
 class Configurator extends Control implements IConfigurator
 {
-    // define constant table names
-    const
-        TABLE_NAME = 'configurator',
-        TABLE_NAME_IDENT = 'configurator_ident';
-
     /** @var string */
     private $tableConfigurator, $tableConfiguratorIdent;
     /** @var Connection */
@@ -138,6 +133,17 @@ class Configurator extends Control implements IConfigurator
                 throw new Exception('Invalid block. Block: "' . $method . '" does not exists.');
             }
         }
+        return null;
+    }
+
+
+    /**
+     * Clean cache.
+     */
+    public function cleanCache()
+    {
+        // internal clean cache
+        $this->cache->clean([Cache::TAGS => 'loadData']);
     }
 
 
@@ -164,9 +170,9 @@ class Configurator extends Control implements IConfigurator
                 $result = $this->connection->insert($this->tableConfiguratorIdent, $values)->execute(Dibi::IDENTIFIER);
             }
 
+            //Cache::EXPIRE => '30 minutes',
             $this->cache->save($key, $result, [
-                Cache::EXPIRE => '30 minutes',
-                Cache::TAGS   => ['loadData'],
+                Cache::TAGS => ['loadData'],
             ]);
         }
         return (int) $result;
@@ -235,7 +241,7 @@ class Configurator extends Control implements IConfigurator
     {
         $values = $this->cache->load('values' . $this->idLocale);
         if ($values === null) {
-            $types = $this->getListType();
+            $types = $this->getListDataType();
 
             // load rows by type
             foreach ($types as $type) {
@@ -243,12 +249,31 @@ class Configurator extends Control implements IConfigurator
                 $values[$type] = $items->fetchAssoc('ident');
             }
 
+            //Cache::EXPIRE => '30 minutes',
             $this->cache->save('values' . $this->idLocale, $values, [
-                Cache::EXPIRE => '30 minutes',
-                Cache::TAGS   => ['loadData'],
+                Cache::TAGS => ['loadData'],
             ]);
         }
         $this->values = $values;
+    }
+
+
+    /**
+     * Get list data.
+     *
+     * @return Fluent
+     */
+    public function getListData(): Fluent
+    {
+        $result = $this->connection->select('c.id, c.id_ident, ci.ident, ' .
+            'IFNULL(lo_c.id_locale, c.id_locale) id_locale, ' .
+            'IFNULL(lo_c.type, c.type) type, ' .
+            'IFNULL(lo_c.content, c.content) content, ' .
+            'IFNULL(lo_c.enable, c.enable) enable')
+            ->from($this->tableConfiguratorIdent)->as('ci')
+            ->join($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')->and(['c.id_locale' => $this->idDefaultLocale])
+            ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=ci.id')->and(['lo_c.id_locale' => $this->idLocale]);
+        return $result;
     }
 
 
@@ -260,16 +285,41 @@ class Configurator extends Control implements IConfigurator
      */
     public function getListDataByType(string $type): Fluent
     {
-        $result = $this->connection->select('c.id, c.id_ident, ci.ident, ' .
-            'IFNULL(lo_c.id_locale, c.id_locale) id_locale, ' .
-            'IFNULL(lo_c.content, c.content) content, ' .
-            'IFNULL(lo_c.enable, c.enable) enable')
-            ->from($this->tableConfiguratorIdent)->as('ci')
-            ->join($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')->and(['c.id_locale' => $this->idDefaultLocale])
-            ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=ci.id')->and(['lo_c.id_locale' => $this->idLocale])
+        $result = $this->getListData()
             ->where('(%or)', ['lo_c.type' => $type, 'c.type' => $type]);
-//        $result->test();
         return $result;
+    }
+
+
+    /**
+     * Get list data type.
+     *
+     * @return array
+     */
+    public function getListDataType(): array
+    {
+        return $this->connection->select('id, type')
+            ->from($this->tableConfigurator)
+            ->groupBy('type')
+            ->orderBy(['type' => 'ASC'])
+            ->fetchPairs('id', 'type');
+    }
+
+
+    /**
+     * Get data by id.
+     *
+     * @param int $id
+     * @param int $idLocale
+     * @return array
+     */
+    public function getDataById(int $id, int $idLocale = 0): array
+    {
+        $result = $this->connection->select('c.id, c.id_locale, c.id_ident, ci.ident, c.type, c.content, c.enable')
+            ->from($this->tableConfigurator)->as('c')
+            ->join($this->tableConfiguratorIdent)->as('ci')->on('ci.id=c.id_ident')->and(['c.id_locale' => $idLocale ?: $this->idDefaultLocale])
+            ->where(['c.id' => $id]);
+        return (array) $result->fetch();
     }
 
 
@@ -286,67 +336,33 @@ class Configurator extends Control implements IConfigurator
     }
 
 
-    /**
-     * Get list type.
-     *
-     * @return array
-     */
-    public function getListType(): array
-    {
-        return $this->connection->select('id, type')
-            ->from($this->tableConfigurator)
-            ->groupBy('type')
-            ->orderBy(['type' => 'ASC'])
-            ->fetchPairs('id', 'type');
-    }
+//    /**
+//     * Delete type.
+//     *
+//     * @param string $type
+//     * @return int
+//     * @throws \Dibi\Exception
+//     */
+//    public function deleteType(string $type): int
+//    {
+//        $result = $this->connection->delete($this->tableConfigurator)
+//            ->where(['type' => $type]);
+//        return (int) $result->execute();
+//    }
 
 
-    /**
-     * Delete type.
-     *
-     * @param string $type
-     * @return int
-     * @throws \Dibi\Exception
-     */
-    public function deleteType(string $type): int
-    {
-        $result = $this->connection->delete($this->tableConfigurator)
-            ->where(['type' => $type]);
-//        $result->test();
-        return (int) $result->execute();
-    }
-
-
-    /**
-     * Get data.
-     *
-     * @param int $id
-     * @param int $idLocale
-     * @return array
-     */
-    public function getData(int $id, int $idLocale = 0): array
-    {
-        $result = $this->connection->select('c.id, c.id_locale, c.id_ident, ci.ident, c.type, c.content, c.enable')
-            ->from($this->tableConfigurator)->as('c')
-            ->join($this->tableConfiguratorIdent)->as('ci')->on('ci.id=c.id_ident')->and(['c.id_locale' => $idLocale ?: $this->idDefaultLocale])
-            ->where(['c.id' => $id]);
-//        $result->test();
-        return (array) $result->fetch();
-    }
-
-
-    /**
-     * Add data.
-     *
-     * @param array $values
-     * @return int
-     * @throws \Dibi\Exception
-     */
-    public function addData(array $values): int
-    {
-        $result = $this->connection->insert($this->tableConfigurator, $values);
-        return (int) $result->execute();
-    }
+//    /**
+//     * Add data.
+//     *
+//     * @param array $values
+//     * @return int
+//     * @throws \Dibi\Exception
+//     */
+//    public function addData(array $values): int
+//    {
+//        $result = $this->connection->insert($this->tableConfigurator, $values);
+//        return (int) $result->execute();
+//    }
 
 
     /**
@@ -376,7 +392,6 @@ class Configurator extends Control implements IConfigurator
     {
         $result = $this->connection->delete($this->tableConfigurator)
             ->where(['id' => $id]);
-//        $result->test();
         return (int) $result->execute();
     }
 }

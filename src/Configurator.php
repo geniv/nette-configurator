@@ -16,7 +16,7 @@ use Nette\Caching\IStorage;
 class Configurator extends Control implements IConfigurator
 {
     /** @var string */
-    private $tableConfigurator, $tableConfiguratorIdent;
+    private $tableConfigurator, $tableConfiguratorIdent, $tableLocale;
     /** @var Connection */
     private $connection;
     /** @var int */
@@ -46,6 +46,7 @@ class Configurator extends Control implements IConfigurator
         // define table names
         $this->tableConfigurator = $prefix . self::TABLE_NAME;
         $this->tableConfiguratorIdent = $prefix . self::TABLE_NAME_IDENT;
+        $this->tableLocale = $prefix . Locale\Drivers\DibiDriver::TABLE;
 
         $this->connection = $connection;
         $this->cache = new Cache($storage, 'Configurator');
@@ -261,9 +262,10 @@ class Configurator extends Control implements IConfigurator
     /**
      * Get list data.
      *
+     * @param int|null $idLocale
      * @return Fluent
      */
-    public function getListData(): Fluent
+    public function getListData(int $idLocale = null): Fluent
     {
         $result = $this->connection->select('c.id, c.id_ident, ci.ident, ' .
             'IFNULL(lo_c.id_locale, c.id_locale) id_locale, ' .
@@ -272,7 +274,7 @@ class Configurator extends Control implements IConfigurator
             'IFNULL(lo_c.enable, c.enable) enable')
             ->from($this->tableConfiguratorIdent)->as('ci')
             ->join($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')->and(['c.id_locale' => $this->idDefaultLocale])
-            ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=ci.id')->and(['lo_c.id_locale' => $this->idLocale]);
+            ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=ci.id')->and(['lo_c.id_locale' => $idLocale ?: $this->idLocale]);
         return $result;
     }
 
@@ -315,9 +317,7 @@ class Configurator extends Control implements IConfigurator
      */
     public function getDataById(int $idIdent, int $idLocale = null): array
     {
-        $result = $this->connection->select('c.id, c.id_locale, c.id_ident, ci.ident, c.type, c.content, c.enable')
-            ->from($this->tableConfigurator)->as('c')
-            ->join($this->tableConfiguratorIdent)->as('ci')->on('ci.id=c.id_ident')->and(['c.id_locale' => $idLocale ?: $this->idDefaultLocale])
+        $result = $this->getListData($idLocale)
             ->where(['c.id_ident' => $idIdent]);
         return (array) ($result->fetch() ?: []);
     }

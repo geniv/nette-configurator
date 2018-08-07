@@ -309,17 +309,17 @@ class Configurator extends Control implements IConfigurator
     /**
      * Get data by id.
      *
-     * @param int $id
-     * @param int $idLocale
+     * @param int      $idIdent
+     * @param int|null $idLocale
      * @return array
      */
-    public function getDataById(int $id, int $idLocale = 0): array
+    public function getDataById(int $idIdent, int $idLocale = null): array
     {
         $result = $this->connection->select('c.id, c.id_locale, c.id_ident, ci.ident, c.type, c.content, c.enable')
             ->from($this->tableConfigurator)->as('c')
             ->join($this->tableConfiguratorIdent)->as('ci')->on('ci.id=c.id_ident')->and(['c.id_locale' => $idLocale ?: $this->idDefaultLocale])
-            ->where(['c.id' => $id]);
-        return (array) $result->fetch();
+            ->where(['c.id_ident' => $idIdent]);
+        return (array) ($result->fetch() ?: []);
     }
 
 
@@ -347,20 +347,6 @@ class Configurator extends Control implements IConfigurator
 //    {
 //        $result = $this->connection->delete($this->tableConfigurator)
 //            ->where(['type' => $type]);
-//        return (int) $result->execute();
-//    }
-
-
-//    /**
-//     * Add data.
-//     *
-//     * @param array $values
-//     * @return int
-//     * @throws \Dibi\Exception
-//     */
-//    public function addData(array $values): int
-//    {
-//        $result = $this->connection->insert($this->tableConfigurator, $values);
 //        return (int) $result->execute();
 //    }
 

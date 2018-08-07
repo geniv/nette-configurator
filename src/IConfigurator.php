@@ -37,9 +37,10 @@ interface IConfigurator
     /**
      * Get list data.
      *
+     * @param int|null $idLocale
      * @return Fluent
      */
-    public function getListData(): Fluent;
+    public function getListData(int $idLocale = null): Fluent;
 
 
     /**

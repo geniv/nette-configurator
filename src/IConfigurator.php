@@ -62,21 +62,11 @@ interface IConfigurator
     /**
      * Get data by id.
      *
-     * @param int $id
-     * @param int $idLocale
+     * @param int      $idIdent
+     * @param int|null $idLocale
      * @return array
      */
-    public function getDataById(int $id, int $idLocale = 0): array;
-
-
-//    /**
-//     * Add data.
-//     *
-//     * @param array $values
-//     * @return int
-//     * @throws \Dibi\Exception
-//     */
-//    public function addData(array $values): int;
+    public function getDataById(int $idIdent, int $idLocale = null): array;
 
 
     /**

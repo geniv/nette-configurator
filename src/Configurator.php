@@ -20,7 +20,9 @@ class Configurator extends Control implements IConfigurator
     /** @var Connection */
     private $connection;
     /** @var int */
-    private $idLocale, $idDefaultLocale;
+    private $idDefaultLocale;
+    /** @var ILocale */
+    private $locale;
     /** @var Cache */
     private $cache;
     /** @var array */
@@ -51,10 +53,8 @@ class Configurator extends Control implements IConfigurator
         $this->connection = $connection;
         $this->cache = new Cache($storage, 'Configurator');
 
-        $this->idLocale = $locale->getId();
+        $this->locale = $locale;
         $this->idDefaultLocale = $locale->getIdDefault();
-
-        $this->getInternalData();  // load data
     }
 
 
@@ -84,6 +84,11 @@ class Configurator extends Control implements IConfigurator
     public function __call($name, $args)
     {
         if (!in_array($name, ['onAnchor'])) {   // exclude method
+            if ($this->locale->isReady() && !$this->values) {
+//                \Tracy\Debugger::fireLog('Configurator::__call');
+                $this->getInternalData();   // load data
+            }
+
             if (!isset($args[0])) {
                 throw new Exception('Identification parameter is not used.');
             }
@@ -240,7 +245,8 @@ class Configurator extends Control implements IConfigurator
      */
     private function getInternalData()
     {
-        $values = $this->cache->load('values' . $this->idLocale);
+        $idLocale = $this->locale->getId();
+        $values = $this->cache->load('values' . $idLocale);
         if ($values === null) {
             $types = $this->getListDataType();
 
@@ -251,7 +257,7 @@ class Configurator extends Control implements IConfigurator
             }
 
             //Cache::EXPIRE => '30 minutes',
-            $this->cache->save('values' . $this->idLocale, $values, [
+            $this->cache->save('values' . $idLocale, $values, [
                 Cache::TAGS => ['loadData'],
             ]);
         }
@@ -274,7 +280,7 @@ class Configurator extends Control implements IConfigurator
             'IFNULL(lo_c.enable, c.enable) enable')
             ->from($this->tableConfiguratorIdent)->as('ci')
             ->join($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')->and(['c.id_locale' => $this->idDefaultLocale])
-            ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=ci.id')->and(['lo_c.id_locale' => $idLocale ?: $this->idLocale]);
+            ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=ci.id')->and(['lo_c.id_locale' => $idLocale ?: $this->locale->getId()]);
         return $result;
     }
 
@@ -282,12 +288,13 @@ class Configurator extends Control implements IConfigurator
     /**
      * Get list data by type.
      *
-     * @param string $type
+     * @param string   $type
+     * @param int|null $idLocale
      * @return Fluent
      */
-    public function getListDataByType(string $type): Fluent
+    public function getListDataByType(string $type, int $idLocale = null): Fluent
     {
-        $result = $this->getListData()
+        $result = $this->getListData($idLocale)
             ->where('(%or)', ['lo_c.type' => $type, 'c.type' => $type]);
         return $result;
     }

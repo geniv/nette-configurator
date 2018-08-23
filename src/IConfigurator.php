@@ -46,10 +46,11 @@ interface IConfigurator
     /**
      * Get list data by type.
      *
-     * @param string $type
+     * @param string   $type
+     * @param int|null $idLocale
      * @return Fluent
      */
-    public function getListDataByType(string $type): Fluent;
+    public function getListDataByType(string $type, int $idLocale = null): Fluent;
 
 
     /**

@@ -31,6 +31,8 @@ services:
 ### description
 internal combination `id_ident` and `id_locale` must by unique! type content is only like "_category_"
 
+Internal data are loading in **first** usage component.
+
 usage:
 ```php
 protected function createComponentConfig(Configurator $configurator)

@@ -84,7 +84,10 @@ class Configurator extends Control implements IConfigurator
     public function __call($name, $args)
     {
         if (!in_array($name, ['onAnchor'])) {   // exclude method
-            $this->getInternalData();  // load data
+            if ($this->locale->isReady() && !$this->values) {
+//                \Tracy\Debugger::fireLog('Configurator::__call');
+                $this->getInternalData();   // load data
+            }
 
             if (!isset($args[0])) {
                 throw new Exception('Identification parameter is not used.');
@@ -285,12 +288,13 @@ class Configurator extends Control implements IConfigurator
     /**
      * Get list data by type.
      *
-     * @param string $type
+     * @param string   $type
+     * @param int|null $idLocale
      * @return Fluent
      */
-    public function getListDataByType(string $type): Fluent
+    public function getListDataByType(string $type, int $idLocale = null): Fluent
     {
-        $result = $this->getListData()
+        $result = $this->getListData($idLocale)
             ->where('(%or)', ['lo_c.type' => $type, 'c.type' => $type]);
         return $result;
     }

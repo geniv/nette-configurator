@@ -55,8 +55,6 @@ class Configurator extends Control implements IConfigurator
 
         $this->locale = $locale;
         $this->idDefaultLocale = $locale->getIdDefault();
-
-        $this->getInternalData();  // load data
     }
 
 
@@ -86,6 +84,8 @@ class Configurator extends Control implements IConfigurator
     public function __call($name, $args)
     {
         if (!in_array($name, ['onAnchor'])) {   // exclude method
+            $this->getInternalData();  // load data
+
             if (!isset($args[0])) {
                 throw new Exception('Identification parameter is not used.');
             }

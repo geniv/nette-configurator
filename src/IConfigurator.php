@@ -24,16 +24,6 @@ interface IConfigurator
     public function getListIdent(): array;
 
 
-//    /**
-//     * Delete type.
-//     *
-//     * @param string $type
-//     * @return int
-//     * @throws \Dibi\Exception
-//     */
-//    public function deleteType(string $type): int;
-
-
     /**
      * Get list data.
      *

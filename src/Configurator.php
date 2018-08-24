@@ -16,7 +16,7 @@ use Nette\Caching\IStorage;
 class Configurator extends Control implements IConfigurator
 {
     /** @var string */
-    private $tableConfigurator, $tableConfiguratorIdent, $tableLocale;
+    private $tableConfigurator, $tableConfiguratorIdent;
     /** @var Connection */
     private $connection;
     /** @var int */
@@ -48,7 +48,6 @@ class Configurator extends Control implements IConfigurator
         // define table names
         $this->tableConfigurator = $prefix . self::TABLE_NAME;
         $this->tableConfiguratorIdent = $prefix . self::TABLE_NAME_IDENT;
-        $this->tableLocale = $prefix . Locale\Drivers\DibiDriver::TABLE;
 
         $this->connection = $connection;
         $this->cache = new Cache($storage, 'Configurator');
@@ -56,7 +55,8 @@ class Configurator extends Control implements IConfigurator
         $this->locale = $locale;
         $this->idDefaultLocale = $locale->getIdDefault();
     }
-
+//TODO typ: list
+//TODO mohl by umet drivery
 
     /**
      * Set auto create.
@@ -199,7 +199,7 @@ class Configurator extends Control implements IConfigurator
     private function addInternalData(string $type, string $identification, string $content = ''): int
     {
         $result = null;
-        $arr = ['ident' => $identification];
+        $arr = ['ident' => $identification, 'type' => $type];
         // load identification
         $idIdentification = $this->getIdIdentification($arr);
 
@@ -214,7 +214,6 @@ class Configurator extends Control implements IConfigurator
             $values = [
                 'id_locale' => $this->idDefaultLocale,  // UQ 1/2 - always default create language
                 'id_ident'  => $idIdentification,       // UQ 2/2
-                'type'      => $type,
                 'content'   => ($content ?: '## ' . $type . ' - ' . $identification . ' ##'),
                 'enable'    => true,                    // always default enabled
             ];
@@ -245,8 +244,8 @@ class Configurator extends Control implements IConfigurator
      */
     private function getInternalData()
     {
-        $idLocale = $this->locale->getId();
-        $values = $this->cache->load('values' . $idLocale);
+        $cacheKey = 'values' . $this->locale->getId();
+        $values = $this->cache->load($cacheKey);
         if ($values === null) {
             $types = $this->getListDataType();
 
@@ -257,7 +256,7 @@ class Configurator extends Control implements IConfigurator
             }
 
             //Cache::EXPIRE => '30 minutes',
-            $this->cache->save('values' . $idLocale, $values, [
+            $this->cache->save($cacheKey, $values, [
                 Cache::TAGS => ['loadData'],
             ]);
         }
@@ -273,9 +272,8 @@ class Configurator extends Control implements IConfigurator
      */
     public function getListData(int $idLocale = null): Fluent
     {
-        $result = $this->connection->select('c.id, c.id_ident, ci.ident, ' .
+        $result = $this->connection->select('c.id, c.id_ident, ci.ident, ci.type, ' .
             'IFNULL(lo_c.id_locale, c.id_locale) id_locale, ' .
-            'IFNULL(lo_c.type, c.type) type, ' .
             'IFNULL(lo_c.content, c.content) content, ' .
             'IFNULL(lo_c.enable, c.enable) enable')
             ->from($this->tableConfiguratorIdent)->as('ci')
@@ -295,7 +293,7 @@ class Configurator extends Control implements IConfigurator
     public function getListDataByType(string $type, int $idLocale = null): Fluent
     {
         $result = $this->getListData($idLocale)
-            ->where('(%or)', ['lo_c.type' => $type, 'c.type' => $type]);
+            ->where(['ci.type' => $type]);
         return $result;
     }
 
@@ -308,7 +306,7 @@ class Configurator extends Control implements IConfigurator
     public function getListDataType(): array
     {
         return $this->connection->select('id, type')
-            ->from($this->tableConfigurator)
+            ->from($this->tableConfiguratorIdent)
             ->groupBy('type')
             ->orderBy(['type' => 'ASC'])
             ->fetchPairs('id', 'type');
@@ -341,21 +339,6 @@ class Configurator extends Control implements IConfigurator
             ->from($this->tableConfiguratorIdent)
             ->fetchPairs('id', 'ident');
     }
-
-
-//    /**
-//     * Delete type.
-//     *
-//     * @param string $type
-//     * @return int
-//     * @throws \Dibi\Exception
-//     */
-//    public function deleteType(string $type): int
-//    {
-//        $result = $this->connection->delete($this->tableConfigurator)
-//            ->where(['type' => $type]);
-//        return (int) $result->execute();
-//    }
 
 
     /**

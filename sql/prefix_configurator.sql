@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Počítač: localhost:3306
--- Vytvořeno: Sob 27. led 2018, 20:27
+-- Vytvořeno: Pát 24. srp 2018, 17:12
 -- Verze serveru: 10.1.26-MariaDB-0+deb9u1
--- Verze PHP: 7.0.27-0+deb9u1
+-- Verze PHP: 7.0.30-0+deb9u1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -29,8 +29,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `prefix_configurator` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `id_locale` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'vazba na jazyk',
-  `id_ident` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'vazba na ident',
-  `type` varchar(50) DEFAULT NULL COMMENT 'typ hodnoty',
+  `id_ident` bigint(20) UNSIGNED NOT NULL COMMENT 'vazba na ident',
   `content` text COMMENT 'hodnota',
   `enable` tinyint(1) DEFAULT '0' COMMENT 'povoleno'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='obecna konfigurace';

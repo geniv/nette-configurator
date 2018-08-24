@@ -55,7 +55,8 @@ class Configurator extends Control implements IConfigurator
         $this->locale = $locale;
         $this->idDefaultLocale = $locale->getIdDefault();
     }
-
+//TODO typ: list
+//TODO mohl by umet drivery
 
     /**
      * Set auto create.

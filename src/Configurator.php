@@ -163,8 +163,8 @@ class Configurator extends Control implements IConfigurator
      */
     private function getIdIdentification(array $values): int
     {
-        $key = 'getIdIdentification' . md5(implode($values));
-        $result = $this->cache->load($key);
+        $cacheKey = 'getIdIdentification' . md5(implode($values));
+        $result = $this->cache->load($cacheKey);
         if ($result === null) {
             $result = $this->connection->select('id')
                 ->from($this->tableConfiguratorIdent)
@@ -177,7 +177,7 @@ class Configurator extends Control implements IConfigurator
             }
 
             //Cache::EXPIRE => '30 minutes',
-            $this->cache->save($key, $result, [
+            $this->cache->save($cacheKey, $result, [
                 Cache::TAGS => ['loadData'],
             ]);
         }
@@ -369,5 +369,20 @@ class Configurator extends Control implements IConfigurator
         $result = $this->connection->delete($this->tableConfigurator)
             ->where(['id' => $id]);
         return (int) $result->execute();
+    }
+
+
+    /**
+     * Get data by ident.
+     *
+     * @param string   $ident
+     * @param int|null $idLocale
+     * @return array
+     */
+    public function getDataByIdent(string $ident, int $idLocale = null): array
+    {
+        $result = $this->getListData($idLocale)
+            ->where(['ci.ident' => $ident]);
+        return (array) ($result->fetch() ?: []);
     }
 }

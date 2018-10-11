@@ -86,4 +86,14 @@ interface IConfigurator
      * Clean cache.
      */
     public function cleanCache();
+
+
+    /**
+     * Get data by ident.
+     *
+     * @param string   $ident
+     * @param int|null $idLocale
+     * @return array
+     */
+    public function getDataByIdent(string $ident, int $idLocale = null): array;
 }

@@ -29,7 +29,7 @@ services:
 ```
 
 ### description
-internal combination `id_ident` and `id_locale` must by unique! type content is only like "_category_"
+internal combination `id_ident` and `id_locale` must by unique! type content is only like "_category_" or "_flag of type_"
 
 Internal data are loading in **first** usage component.
 
@@ -63,6 +63,8 @@ $this['config']->renderCheckbox('show-web-title', true);
 $presenter['config']->setTranslator('ident', 'text');
 
 $this['config']->setEditor('ident', 'new text');
+
+$this['config']->getDataByIdent('ident');
 ```
 
 usage:

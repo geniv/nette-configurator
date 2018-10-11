@@ -370,4 +370,19 @@ class Configurator extends Control implements IConfigurator
             ->where(['id' => $id]);
         return (int) $result->execute();
     }
+
+
+    /**
+     * Get data by ident.
+     *
+     * @param string   $ident
+     * @param int|null $idLocale
+     * @return array
+     */
+    public function getDataByIdent(string $ident, int $idLocale = null): array
+    {
+        $result = $this->getListData($idLocale)
+            ->where(['ci.ident' => $ident]);
+        return (array) ($result->fetch() ?: []);
+    }
 }

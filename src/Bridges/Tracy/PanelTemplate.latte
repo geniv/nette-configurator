@@ -1,0 +1,65 @@
+{define svgTrue}
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16">
+        <path d="M504.502 75.496c-9.997-9.998-26.205-9.998-36.204 0L161.594 382.203 43.702 264.311c-9.997-9.998-26.205-9.997-36.204 0-9.998 9.997-9.998 26.205 0 36.203l135.994 135.992c9.994 9.997 26.214 9.99 36.204 0L504.502 111.7c9.998-9.997 9.997-26.206 0-36.204z"/>
+    </svg>
+{/define}
+
+{define svgFalse}
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" width="16" height="16">
+        <path d="M294.111 256.001L504.109 46.003c10.523-10.524 10.523-27.586 0-38.109-10.524-10.524-27.587-10.524-38.11 0L256 217.892 46.002 7.894C35.478-2.63 18.416-2.63 7.893 7.894s-10.524 27.586 0 38.109l209.998 209.998L7.893 465.999c-10.524 10.524-10.524 27.586 0 38.109 10.524 10.524 27.586 10.523 38.109 0L256 294.11l209.997 209.998c10.524 10.524 27.587 10.523 38.11 0 10.523-10.524 10.523-27.586 0-38.109L294.111 256.001z"/>
+    </svg>
+{/define}
+
+<h1>{$class}</h1>
+<div class="tracy-inner">
+    <table>
+        <caption>Used translate</caption>
+        <tr>
+            <th>Identifier/ Translate</th>
+            <th>Translated</th>
+        </tr>
+        <tr n:foreach="$listUsedTranslate as $ident => $used">
+            <td n:if="$used">
+                <a n:tag-ifset="$dictionary[$ident]" class="tracy-toggle tracy-collapsed" data-tracy-ref="^div .tracy-used-translate-ident-{$ident|webalize}">{$ident}</a>
+                <div n:ifset="$dictionary[$ident]" n:if="$used" class="tracy-used-translate-ident-{$ident|webalize} tracy-collapsed">{$dictionary[$ident]}</div>
+            </td>
+            <td n:if="!$used">
+                {$ident}
+            </td>
+            <td style="text-align: center;">
+                {if $used}{include #svgTrue}{else}{include #svgFalse}{/if}
+            </td>
+        </tr>
+        <tr n:if="!$iterations">
+            <td colspan="2" style="text-align: center;">No translate items</td>
+        </tr>
+    </table>
+
+    {if $listDefaultTranslate}
+        <h2>
+            <a class="tracy-toggle tracy-collapsed" data-tracy-ref="^div .tracy-default-translate-panel">Used translate from default files</a>
+        </h2>
+        <div class="tracy-default-translate-panel tracy-collapsed">
+            <table>
+                {foreach $listDefaultTranslate as $file => $items}
+                    <tr>
+                        <th>{$file}</th>
+                        <th>Used</th>
+                    </tr>
+                    <tr n:foreach="$items as $ident => $item">
+                        <td>
+                            <a n:tag-ifset="$listAllDefaultTranslate[$ident]" class="tracy-toggle tracy-collapsed" data-tracy-ref="^div .tracy-default-translate-item-{$ident|webalize}">{$ident}</a>
+                            <div n:ifset="$listAllDefaultTranslate[$ident]" class="tracy-default-translate-item-{$ident|webalize} tracy-collapsed">{$item}</div>
+                        </td>
+                        <td style="text-align: center;">
+                            {ifset $listUsedTranslate[$ident]}{include #svgTrue}{else}{include #svgFalse}{/ifset}
+                        </td>
+                    </tr>
+                    <tr n:if="!$iterations">
+                        <td colspan="2" style="text-align: center;">No default items</td>
+                    </tr>
+                {/foreach}
+            </table>
+        </div>
+    {/if}
+</div>

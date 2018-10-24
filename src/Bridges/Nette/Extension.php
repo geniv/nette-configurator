@@ -16,11 +16,12 @@ class Extension extends CompilerExtension
 {
     /** @var array default values */
     private $defaults = [
-        'debugger'  => true,
-        'autowired' => true,
-        'driver'    => null,
-        //        'searchPath'  => [],
-        //        'excludePath' => [],
+        'debugger'    => true,
+        'autowired'   => true,
+        'driver'      => null,
+        'searchMask'  => '*Translation.neon',
+        'searchPath'  => [],
+        'excludePath' => [],
     ];
 
 
@@ -35,17 +36,17 @@ class Extension extends CompilerExtension
         // define driver
         $default = $builder->addDefinition($this->prefix('default'))
             ->setFactory($config['driver'])
-//            ->addSetup('setSearchPath', [$config['searchPath'], $config['excludePath']])
+            ->addSetup('setSearchPath', [$config['searchMask'], $config['searchPath'], $config['excludePath']])
             ->setAutowired($config['autowired']);
 
         // define panel
-//        if ($config['debugger']) {
-//            $panel = $builder->addDefinition($this->prefix('panel'))
-//                ->setFactory(Panel::class, [$default]);
-//
-//            // linked panel to tracy
-//            $builder->getDefinition('tracy.bar')
-//                ->addSetup('addPanel', [$panel]);
-//        }
+        if ($config['debugger']) {
+            $panel = $builder->addDefinition($this->prefix('panel'))
+                ->setFactory(Panel::class, [$default]);
+
+            // linked panel to tracy
+            $builder->getDefinition('tracy.bar')
+                ->addSetup('addPanel', [$panel]);
+        }
     }
 }

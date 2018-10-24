@@ -22,6 +22,10 @@ abstract class Configurator extends Control implements IConfigurator
     protected $values;
     /** @var bool */
     private $autoCreate = true;
+    /** @var string */
+    private $searchMask;
+    /** @var array */
+    private $searchPath, $excludePath;
 
 
     /**
@@ -65,6 +69,8 @@ abstract class Configurator extends Control implements IConfigurator
             if ($this->locale->isReady() && !$this->values) {
 //                \Tracy\Debugger::fireLog('Configurator::__call');
                 $this->loadInternalData();   // load data
+                // process default content
+                $this->searchDefaultContent($this->searchMask, $this->searchPath, $this->excludePath);
             }
 
             if (!isset($args[0])) {
@@ -150,4 +156,103 @@ abstract class Configurator extends Control implements IConfigurator
      * @internal
      */
     abstract protected function loadInternalData();
+
+
+    /*
+     *
+     * -- SYSTEM --
+     *
+     */
+
+
+    /**
+     * Set path search.
+     *
+     * @param string $searchMask
+     * @param array  $searchPath
+     * @param array  $excludePath
+     */
+    public function setSearchPath(string $searchMask, array $searchPath = [], array $excludePath = [])
+    {
+        $this->searchMask = $searchMask;
+        $this->searchPath = $searchPath;
+        $this->excludePath = $excludePath;
+    }
+
+
+    /**
+     * Search default translate.
+     *
+     * @param string $searchMask
+     * @param array  $searchPath
+     * @param array  $excludePath
+     */
+    private function searchDefaultContent(string $searchMask, array $searchPath = [], array $excludePath = [])
+    {
+        if ($searchPath) {
+            $messages = [];
+//
+//            $files = [];
+//            foreach ($searchPath as $path) {
+//                // insert dirs
+//                if (is_dir($path)) {
+//                    $fil = [];
+//                    foreach (Finder::findFiles('*Translation.neon')->exclude($excludePath)->from($path) as $file) {
+//                        $fil[] = $file;
+//                    }
+//                    natsort($fil);  // natural sorting path
+//                    $files = array_merge($files, $fil);  // merge sort array
+//                }
+//                // insert file
+//                if (is_file($path)) {
+//                    $files[] = new SplFileInfo($path);
+//                }
+//            }
+//
+//            // load all default translation files
+//            foreach ($files as $file) {
+//                $lengthPath = strlen(dirname(__DIR__, 4));
+//                $partPath = substr($file->getRealPath(), $lengthPath + 1);
+//
+//                $fileContent = (array) Neon::decode(file_get_contents($file->getPathname()));
+//                $this->listDefaultTranslate[$partPath] = $fileContent;  // collect all translate by dir
+//
+//                $messages = array_merge($messages, $fileContent);  // translate file may by empty
+//            }
+//            $this->listAllDefaultTranslate = $messages; // collect all translate
+//
+//            if ($this->dictionary) {
+//                // if define dictionary
+//                foreach ($messages as $identification => $message) {
+//                    // save only not exist identification and only string message or identification is same like dictionary index (default translate)
+//                    if ((!isset($this->dictionary[$identification]) && !is_array($message)) || $this->dictionary[$identification] == $identification) {
+//                        // call only save default value load from files
+//                        $this->saveTranslate($identification, $message);
+//                    }
+//                }
+//            }
+        }
+    }
+
+
+//    /**
+//     * Get list default translate.
+//     *
+//     * @return array
+//     */
+//    public function getListDefaultTranslate(): array
+//    {
+//        return $this->listDefaultTranslate;
+//    }
+
+
+//    /**
+//     * Get list all default translate.
+//     *
+//     * @return array
+//     */
+//    public function getListAllDefaultTranslate(): array
+//    {
+//        return $this->listAllDefaultTranslate;
+//    }
 }

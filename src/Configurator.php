@@ -57,13 +57,14 @@ abstract class Configurator extends Control implements IConfigurator
      * @param $name
      * @param $args
      * @return mixed|null
+     * @throws \Dibi\Exception
      */
     public function __call($name, $args)
     {
         if (!in_array($name, ['onAnchor'])) {   // exclude method
             if ($this->locale->isReady() && !$this->values) {
 //                \Tracy\Debugger::fireLog('Configurator::__call');
-                $this->getInternalData();   // load data
+                $this->loadInternalData();   // load data
             }
 
             if (!isset($args[0])) {
@@ -98,7 +99,7 @@ abstract class Configurator extends Control implements IConfigurator
             // create
             if ($this->autoCreate && (!isset($this->values[$method]) || !isset($this->values[$method][$ident]))) {
                 $this->addInternalData($method, $ident);    // insert
-                $this->getInternalData();                  // reloading
+                $this->loadInternalData();                  // reloading
             }
 
             // load value
@@ -121,11 +122,11 @@ abstract class Configurator extends Control implements IConfigurator
 
 
     /**
-     * Get id identification.
+     * Get internal id identification.
      *
      * @param array $values
      * @return int
-     * @throws Exception
+     * @throws \Dibi\Exception
      */
     abstract protected function getInternalIdIdentification(array $values): int;
 
@@ -144,10 +145,9 @@ abstract class Configurator extends Control implements IConfigurator
 
 
     /**
-     * Get data.
+     * Load internal data.
      *
      * @internal
-     * @throws Exception
      */
-    abstract protected function getInternalData();
+    abstract protected function loadInternalData();
 }

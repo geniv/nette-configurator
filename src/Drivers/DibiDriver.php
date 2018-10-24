@@ -265,12 +265,11 @@ class DibiDriver extends Configurator
 
 
     /**
-     * Get internal data.
+     * Load internal data.
      *
      * @internal
-     * @throws \Throwable
      */
-    protected function getInternalData()
+    protected function loadInternalData()
     {
         $cacheKey = 'values' . $this->locale->getId();
         $values = $this->cache->load($cacheKey);
@@ -283,10 +282,12 @@ class DibiDriver extends Configurator
                 $values[$type] = $items->fetchAssoc('ident');
             }
 
-            //Cache::EXPIRE => '30 minutes',
-            $this->cache->save($cacheKey, $values, [
-                Cache::TAGS => ['loadData'],
-            ]);
+            try {
+                $this->cache->save($cacheKey, $values, [
+                    Cache::TAGS => ['loadData'],
+                ]);
+            } catch (\Throwable $e) {
+            }
         }
         $this->values = $values;
     }

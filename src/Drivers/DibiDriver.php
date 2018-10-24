@@ -30,10 +30,6 @@ class DibiDriver extends Configurator
     private $tableConfigurator, $tableConfiguratorIdent;
     /** @var Cache */
     private $cache;
-//    /** @var ILocale */
-//    private $locale;
-//    /** @var int */
-//    private $idDefaultLocale;
 
 
     /**
@@ -43,7 +39,6 @@ class DibiDriver extends Configurator
      * @param Connection $connection
      * @param ILocale    $locale
      * @param IStorage   $storage
-     * @throws \Exception
      */
     public function __construct(string $prefix, Connection $connection, ILocale $locale, IStorage $storage)
     {
@@ -55,9 +50,6 @@ class DibiDriver extends Configurator
 
         $this->connection = $connection;
         $this->cache = new Cache($storage, 'Configurator');
-
-//        $this->locale = $locale;
-//        $this->idDefaultLocale = $locale->getIdDefault();
     }
 
 
@@ -175,7 +167,9 @@ class DibiDriver extends Configurator
     public function cleanCache()
     {
         // internal clean cache
-        $this->cache->clean([Cache::TAGS => 'loadData']);
+        $this->cache->clean([
+            Cache::TAGS => ['loadData'],
+        ]);
     }
 
 
@@ -200,7 +194,6 @@ class DibiDriver extends Configurator
      * @param array $values
      * @return int
      * @throws \Dibi\Exception
-     * @throws \Throwable
      */
     protected function getInternalIdIdentification(array $values): int
     {
@@ -218,9 +211,12 @@ class DibiDriver extends Configurator
             }
 
             //Cache::EXPIRE => '30 minutes',
-            $this->cache->save($cacheKey, $result, [
-                Cache::TAGS => ['loadData'],
-            ]);
+            try {
+                $this->cache->save($cacheKey, $result, [
+                    Cache::TAGS => ['loadData'],
+                ]);
+            } catch (\Throwable $e) {
+            }
         }
         return (int) $result;
     }
@@ -234,9 +230,7 @@ class DibiDriver extends Configurator
      * @param string $identification
      * @param string $content
      * @return int
-     * @throws Throwable
      * @throws \Dibi\Exception
-     * @throws \Throwable
      */
     protected function addInternalData(string $type, string $identification, string $content = ''): int
     {
@@ -261,18 +255,11 @@ class DibiDriver extends Configurator
             ];
             // only insert data
             $result = $this->connection->insert($this->tableConfigurator, $values)->execute();
-
-            $this->cache->clean([
-                Cache::TAGS => ['loadData'],
-            ]);
         } else {
             // update data
             $result = $this->connection->update($this->tableConfigurator, ['content' => $content])->where(['id' => $conf])->execute();
-
-            $this->cache->clean([
-                Cache::TAGS => ['loadData'],
-            ]);
         }
+        $this->cleanCache();
         return (int) $result;
     }
 
@@ -281,8 +268,6 @@ class DibiDriver extends Configurator
      * Get internal data.
      *
      * @internal
-     * @throws Exception
-     * @throws Throwable
      * @throws \Throwable
      */
     protected function getInternalData()
@@ -305,5 +290,4 @@ class DibiDriver extends Configurator
         }
         $this->values = $values;
     }
-
 }

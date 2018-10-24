@@ -1,20 +1,18 @@
 <?php declare(strict_types=1);
 
+namespace Configurator;
+
 use Dibi\Fluent;
 
 
 /**
  * Interface IConfigurator
  *
+ * @package Configurator
  * @author  geniv
  */
 interface IConfigurator
 {
-    // define constant table names
-    const
-        TABLE_NAME = 'configurator',
-        TABLE_NAME_IDENT = 'configurator_ident';
-
 
     /**
      * Get list ident.

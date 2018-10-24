@@ -35,10 +35,16 @@ class DibiDriver implements IConfigurator
     private $idDefaultLocale;
 
 
+    /**
+     * DibiDriver constructor.
+     *
+     * @param string     $prefix
+     * @param Connection $connection
+     * @param ILocale    $locale
+     * @param IStorage   $storage
+     */
     public function __construct(string $prefix, Connection $connection, ILocale $locale, IStorage $storage)
     {
-        parent::__construct();
-
         // define table names
         $this->tableConfigurator = $prefix . self::TABLE_NAME;
         $this->tableConfiguratorIdent = $prefix . self::TABLE_NAME_IDENT;

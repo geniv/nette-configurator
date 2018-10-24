@@ -2,7 +2,7 @@
 
 namespace Configurator\Bridges\Tracy;
 
-use Configurator\Configurator;
+use Configurator\IConfigurator;
 use Latte\Engine;
 use Nette\SmartObject;
 use Tracy\IBarPanel;
@@ -18,16 +18,16 @@ class Panel implements IBarPanel
 {
     use SmartObject;
 
-    /** @var Configurator */
+    /** @var IConfigurator */
     private $configurator;
 
 
     /**
      * Panel constructor.
      *
-     * @param Configurator $configurator
+     * @param IConfigurator $configurator
      */
-    public function __construct(Configurator $configurator)
+    public function __construct(IConfigurator $configurator)
     {
         $this->configurator = $configurator;
     }

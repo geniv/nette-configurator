@@ -39,13 +39,13 @@ class Extension extends CompilerExtension
             ->setAutowired($config['autowired']);
 
         // define panel
-        if ($config['debugger']) {
-            $panel = $builder->addDefinition($this->prefix('panel'))
-                ->setFactory(Panel::class, [$default]);
-
-            // linked panel to tracy
-            $builder->getDefinition('tracy.bar')
-                ->addSetup('addPanel', [$panel]);
-        }
+//        if ($config['debugger']) {
+//            $panel = $builder->addDefinition($this->prefix('panel'))
+//                ->setFactory(Panel::class, [$default]);
+//
+//            // linked panel to tracy
+//            $builder->getDefinition('tracy.bar')
+//                ->addSetup('addPanel', [$panel]);
+//        }
     }
 }

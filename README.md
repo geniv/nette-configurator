@@ -35,9 +35,7 @@ configurator:
 #    searchMask: 
 #       - *Translation.neon
     searchPath:
-        - %appDir%/../vendor/geniv  # first vendor
-        - %appDir%
-        - %appDir%/presenters/CustomTranslation.neon
+        - %appDir%/presenters/AppTranslation.neon
 #    excludePath:
 #        - CustomExcludeTranslation.neon
 ```

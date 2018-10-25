@@ -249,13 +249,12 @@ abstract class Configurator extends Control implements IConfigurator
             }
 
             if ($this->flattenValues) {
+                // list all content
                 foreach ($this->listAllContent as $index => $item) {
-//                    if ($item['type'] != 'translation') {
-                    if (isset($this->flattenValues[$index]) && $this->flattenValues[$index]['content'] == $this->getDefaultContent($item['type'], $index)) {
-                        // call only not translation, exist index, value is default
+                    // call only values not exist or values is default value
+                    if (!isset($this->flattenValues[$index]) || $this->flattenValues[$index]['content'] == $this->getDefaultContent($item['type'], $index)) {
                         $this->addInternalData($item['type'], $index, $item['value']); // insert data
                     }
-//                    }
                 }
             }
         }

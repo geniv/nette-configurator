@@ -32,7 +32,8 @@ configurator:
 #   debugger: true
 #   autowired: true
     driver: Configurator\Drivers\DibiDriver(%tablePrefix%)
-#    searchMask: *Translation.neon
+#    searchMask: 
+#       - *Translation.neon
     searchPath:
         - %appDir%/../vendor/geniv  # first vendor
         - %appDir%

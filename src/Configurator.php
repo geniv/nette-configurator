@@ -25,10 +25,8 @@ abstract class Configurator extends Control implements IConfigurator
     protected $values;
     /** @var bool */
     private $autoCreate = true;
-    /** @var string */
-    private $searchMask;
     /** @var array */
-    private $searchPath, $excludePath, $listDefaultContent, $listAllDefaultContent;
+    private $searchMask, $searchPath, $excludePath, $listDefaultContent, $listAllDefaultContent;
 
 
     /**
@@ -65,6 +63,7 @@ abstract class Configurator extends Control implements IConfigurator
      * @param $args
      * @return mixed|null
      * @throws \Dibi\Exception
+     * @throws Exception
      */
     public function __call($name, $args)
     {
@@ -171,11 +170,11 @@ abstract class Configurator extends Control implements IConfigurator
     /**
      * Set path search.
      *
-     * @param string $searchMask
-     * @param array  $searchPath
-     * @param array  $excludePath
+     * @param array $searchMask
+     * @param array $searchPath
+     * @param array $excludePath
      */
-    public function setSearchPath(string $searchMask, array $searchPath = [], array $excludePath = [])
+    public function setSearchPath(array $searchMask = [], array $searchPath = [], array $excludePath = [])
     {
         $this->searchMask = $searchMask;
         $this->searchPath = $searchPath;
@@ -186,13 +185,13 @@ abstract class Configurator extends Control implements IConfigurator
     /**
      * Search default translate.
      *
-     * @param string $searchMask
-     * @param array  $searchPath
-     * @param array  $excludePath
+     * @param array $searchMask
+     * @param array $searchPath
+     * @param array $excludePath
      */
-    private function searchDefaultContent(string $searchMask, array $searchPath = [], array $excludePath = [])
+    private function searchDefaultContent(array $searchMask, array $searchPath = [], array $excludePath = [])
     {
-        if ($searchPath) {
+        if ($searchMask && $searchPath) {
             $messages = [];
 
             $files = [];
@@ -219,14 +218,16 @@ abstract class Configurator extends Control implements IConfigurator
 
                 $fileContent = (array) Neon::decode(file_get_contents($file->getPathname()));
 
-                dump($fileContent);
+dump($fileContent);
 
                 $this->listDefaultContent[$partPath] = $fileContent;  // collect all translate by dir
 
                 $messages = array_merge($messages, $fileContent);  // translate file may by empty
             }
             $this->listAllDefaultContent = $messages; // collect all translate
+
 dump($this->listDefaultContent, $this->listAllDefaultContent);
+
 //            if ($this->dictionary) {
 //                // if define dictionary
 //                foreach ($messages as $identification => $message) {

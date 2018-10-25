@@ -19,7 +19,7 @@ class Extension extends CompilerExtension
         'debugger'    => true,
         'autowired'   => true,
         'driver'      => null,
-        'searchMask'  => '*Translation.neon',
+        'searchMask'  => ['*Translation.neon'],
         'searchPath'  => [],
         'excludePath' => [],
     ];

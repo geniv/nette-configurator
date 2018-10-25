@@ -15,13 +15,13 @@
     <table>
         <caption>Used content</caption>
         {*<tr>*}
-            {*<th>Identifier/ Translate</th>*}
-            {*<th>Translated</th>*}
+            {*<th>Identifier/ Configure</th>*}
+            {*<th>???</th>*}
         {*</tr>*}
-        {*<tr n:foreach="$listUsedTranslate as $ident => $used">*}
+        <tr n:foreach="$listUsedContent as $ident => $item">
             {*<td n:if="$used">*}
-                {*<a n:tag-ifset="$dictionary[$ident]" class="tracy-toggle tracy-collapsed" data-tracy-ref="^div .tracy-used-translate-ident-{$ident|webalize}">{$ident}</a>*}
-                {*<div n:ifset="$dictionary[$ident]" n:if="$used" class="tracy-used-translate-ident-{$ident|webalize} tracy-collapsed">{$dictionary[$ident]}</div>*}
+                {*<a n:tag-ifset="$dictionary[$ident]" class="tracy-toggle tracy-collapsed" data-tracy-ref="^div .tracy-used-configure-ident-{$ident|webalize}">{$ident}</a>*}
+                {*<div n:ifset="$dictionary[$ident]" n:if="$used" class="tracy-used-configure-ident-{$ident|webalize} tracy-collapsed">{$dictionary[$ident]}</div>*}
             {*</td>*}
             {*<td n:if="!$used">*}
                 {*{$ident}*}
@@ -29,37 +29,37 @@
             {*<td style="text-align: center;">*}
                 {*{if $used}{include #svgTrue}{else}{include #svgFalse}{/if}*}
             {*</td>*}
-        {*</tr>*}
-        {*<tr n:if="!$iterations">*}
-            {*<td colspan="2" style="text-align: center;">No translate items</td>*}
-        {*</tr>*}
+        </tr>
+        <tr n:if="!$iterations">
+            <td colspan="2" style="text-align: center;">No configure items</td>
+        </tr>
     </table>
 
-    {*{if $listDefaultTranslate}*}
+    {if $listCategoryContent}
         <h2>
-            <a class="tracy-toggle tracy-collapsed" data-tracy-ref="^div .tracy-default-translate-panel">Used translate from default files</a>
+            <a class="tracy-toggle tracy-collapsed" data-tracy-ref="^div .tracy-default-configure-panel">Used configure from default files</a>
         </h2>
-        <div class="tracy-default-translate-panel tracy-collapsed">
+        <div class="tracy-default-configure-panel tracy-collapsed">
             <table>
-                {*{foreach $listDefaultTranslate as $file => $items}*}
-                    {*<tr>*}
-                        {*<th>{$file}</th>*}
-                        {*<th>Used</th>*}
-                    {*</tr>*}
-                    {*<tr n:foreach="$items as $ident => $item">*}
-                        {*<td>*}
-                            {*<a n:tag-ifset="$listAllDefaultTranslate[$ident]" class="tracy-toggle tracy-collapsed" data-tracy-ref="^div .tracy-default-translate-item-{$ident|webalize}">{$ident}</a>*}
-                            {*<div n:ifset="$listAllDefaultTranslate[$ident]" class="tracy-default-translate-item-{$ident|webalize} tracy-collapsed">{$item}</div>*}
-                        {*</td>*}
-                        {*<td style="text-align: center;">*}
-                            {*{ifset $listUsedTranslate[$ident]}{include #svgTrue}{else}{include #svgFalse}{/ifset}*}
-                        {*</td>*}
-                    {*</tr>*}
-                    {*<tr n:if="!$iterations">*}
-                        {*<td colspan="2" style="text-align: center;">No default items</td>*}
-                    {*</tr>*}
-                {*{/foreach}*}
+                {foreach $listCategoryContent as $file => $items}
+                    <tr>
+                        <th>{$file}</th>
+                        <th>Used</th>
+                    </tr>
+                    <tr n:foreach="$items as $ident => $item">
+                        <td>
+                            <a n:tag-ifset="$listAllContent[$ident]" class="tracy-toggle tracy-collapsed" data-tracy-ref="^div .tracy-default-configure-item-{$ident|webalize}">{$ident}</a>
+                            <div n:ifset="$listAllContent[$ident]" class="tracy-default-configure-item-{$ident|webalize} tracy-collapsed">{$item}</div>
+                        </td>
+                        <td style="text-align: center;">
+                            {ifset $listUsedContent[$ident]}{include #svgTrue}{else}{include #svgFalse}{/ifset}
+                        </td>
+                    </tr>
+                    <tr n:if="!$iterations">
+                        <td colspan="2" style="text-align: center;">No default items</td>
+                    </tr>
+                {/foreach}
             </table>
         </div>
-    {*{/if}*}
+    {/if}
 </div>

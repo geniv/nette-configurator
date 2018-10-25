@@ -230,7 +230,7 @@ abstract class Configurator extends Control implements IConfigurator
                 }
             }
 
-            dump($this->allValues);
+dump($this->flattenValues);
             if ($this->values) {
                 foreach ($this->listAllDefaultContent as $index => $item) {
                     if (isset($this->values[$item['type']]) && !isset($this->values[$item['type']][$item['index']]) && $item['type'] != 'translation') {

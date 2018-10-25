@@ -291,12 +291,12 @@ class DibiDriver extends Configurator
             }
         }
 
-        $cacheKeyAll = 'allValues' . $this->locale->getId();
-        $this->allValues = $this->cache->load($cacheKeyAll);
-        if ($this->allValues === null) {
+        $cacheKeyFlatten = 'flattenValues' . $this->locale->getId();
+        $this->flattenValues = $this->cache->load($cacheKeyFlatten);
+        if ($this->flattenValues === null) {
             try {
-                $this->allValues = Arrays::flatten($this->values, true);
-                $this->cache->save($cacheKeyAll, $this->allValues, [
+                $this->flattenValues = Arrays::flatten($this->values, true);
+                $this->cache->save($cacheKeyFlatten, $this->flattenValues, [
                     Cache::TAGS => ['loadData'],
                 ]);
             } catch (\Throwable $e) {

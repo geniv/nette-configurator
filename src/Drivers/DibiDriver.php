@@ -9,6 +9,7 @@ use Dibi\Fluent;
 use Locale\ILocale;
 use Nette\Caching\Cache;
 use Nette\Caching\IStorage;
+use Nette\Utils\Arrays;
 
 
 /**
@@ -272,23 +273,34 @@ class DibiDriver extends Configurator
     protected function loadInternalData()
     {
         $cacheKey = 'values' . $this->locale->getId();
-        $values = $this->cache->load($cacheKey);
-        if ($values === null) {
+        $this->values = $this->cache->load($cacheKey);
+        if ($this->values === null) {
             $types = $this->getListDataType();
 
             // load rows by type
             foreach ($types as $type) {
                 $items = $this->getListDataByType($type);
-                $values[$type] = $items->fetchAssoc('ident');
+                $this->values[$type] = $items->fetchAssoc('ident');
             }
 
             try {
-                $this->cache->save($cacheKey, $values, [
+                $this->cache->save($cacheKey, $this->values, [
                     Cache::TAGS => ['loadData'],
                 ]);
             } catch (\Throwable $e) {
             }
         }
-        $this->values = $values;
+
+        $cacheKeyAll = 'allValues' . $this->locale->getId();
+        $this->allValues = $this->cache->load($cacheKeyAll);
+        if ($this->allValues === null) {
+            try {
+                $this->allValues = Arrays::flatten($this->values, true);
+                $this->cache->save($cacheKeyAll, $this->allValues, [
+                    Cache::TAGS => ['loadData'],
+                ]);
+            } catch (\Throwable $e) {
+            }
+        }
     }
 }

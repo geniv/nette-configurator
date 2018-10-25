@@ -23,7 +23,7 @@ abstract class Configurator extends Control implements IConfigurator
     /** @var ILocale */
     protected $locale;
     /** @var array */
-    protected $values;
+    protected $values, $flattenValues;
     /** @var bool */
     private $autoCreate = true;
     /** @var array */
@@ -189,12 +189,11 @@ abstract class Configurator extends Control implements IConfigurator
      * @param array $searchMask
      * @param array $searchPath
      * @param array $excludePath
+     * @throws \Dibi\Exception
      */
     private function searchDefaultContent(array $searchMask, array $searchPath = [], array $excludePath = [])
     {
         if ($searchMask && $searchPath) {
-//            $messages = [];
-
             $files = [];
             foreach ($searchPath as $path) {
                 // insert dirs
@@ -230,19 +229,14 @@ abstract class Configurator extends Control implements IConfigurator
                     $this->listAllDefaultContent[$index] = $value;
                 }
             }
-//            $this->listAllDefaultContent = $messages; // collect all translate
 
-            dump($this->listCategoryDefaultContent, $this->listAllDefaultContent);
-
+            dump($this->allValues);
             if ($this->values) {
-                dump($this->values);
-                dump($this->listAllDefaultContent);
                 foreach ($this->listAllDefaultContent as $index => $item) {
-                    if (isset($this->values[$item['type']]) && $this->values[$item['type']]) {
+                    if (isset($this->values[$item['type']]) && !isset($this->values[$item['type']][$item['index']]) && $item['type'] != 'translation') {
                         $this->addInternalData($item['type'], $item['index'], $item['value']); // insert data
                     }
                 }
-
             }
 
 

@@ -183,6 +183,7 @@ class DibiDriver extends Configurator
      */
     public function getDataByIdent(string $ident, int $idLocale = null): array
     {
+//        dump($this->flattenValues);
         $result = $this->getListData($idLocale)
             ->where(['ci.ident' => $ident]);
         return (array) ($result->fetch() ?: []);

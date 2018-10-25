@@ -31,6 +31,7 @@ neon configure:
 configurator:
 #   debugger: true
 #   autowired: true
+#    driver: Configurator\Drivers\DevNullDriver
     driver: Configurator\Drivers\DibiDriver(%tablePrefix%)
 #    searchMask: 
 #       - *Translation.neon

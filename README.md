@@ -22,10 +22,30 @@ require:
 Include in application
 ----------------------
 
+available source drivers:
+- DibiDriver (dibi + cache)
+
 neon configure:
 ```neon
-services:
-    - Configurator(%tablePrefix%)
+# configurator
+configurator:
+#   debugger: true
+#   autowired: true
+    driver: Configurator\Drivers\DibiDriver(%tablePrefix%)
+#    searchMask: 
+#       - *Translation.neon
+    searchPath:
+        - %appDir%/../vendor/geniv  # first vendor
+        - %appDir%
+        - %appDir%/presenters/CustomTranslation.neon
+#    excludePath:
+#        - CustomExcludeTranslation.neon
+```
+
+neon configure extension:
+```neon
+extensions:
+    configurator: Configurator\Bridges\Nette\Extension
 ```
 
 ### description

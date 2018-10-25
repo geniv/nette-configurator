@@ -71,7 +71,8 @@ abstract class Configurator extends Control implements IConfigurator
         if (!in_array($name, ['onAnchor'])) {   // exclude method
             if ($this->locale->isReady() && !$this->values) {
 //                \Tracy\Debugger::fireLog('Configurator::__call');
-                $this->loadInternalData();   // load data
+                // load data
+                $this->loadInternalData();
                 // process default content
                 $this->searchDefaultContent($this->searchMask, $this->searchPath, $this->excludePath);
             }
@@ -215,25 +216,29 @@ abstract class Configurator extends Control implements IConfigurator
             foreach ($files as $file) {
                 $lengthPath = strlen(dirname(__DIR__, 4));
                 $partPath = substr($file->getRealPath(), $lengthPath + 1);
-
+                // load neon file
                 $fileContent = (array) Neon::decode(file_get_contents($file->getPathname()));
-
+                // prepare empty row
+                $this->listCategoryDefaultContent[$partPath] = [];
                 // decode type logic
                 $defaultType = 'translation';
                 foreach ($fileContent as $index => $item) {
-                    $indexType = Strings::match($index, '#@[a-z]+@#');
-                    $contentType = Strings::trim(implode((array) $indexType), '@');
+                    $prepareType = Strings::match($index, '#@[a-z]+@#');
+                    // content type
+                    $contentType = Strings::trim(implode((array) $prepareType), '@');
+                    // content index
                     $contentIndex = Strings::replace($index, ['#@[a-z]+@#' => '']);
-                    $value = ['type' => $contentType ?: $defaultType, 'index' => $contentIndex, 'value' => $item];
-                    $this->listCategoryDefaultContent[$partPath][$index] = $value;
-                    $this->listAllDefaultContent[$index] = $value;
+                    $value = ['type' => $contentType ?: $defaultType, 'value' => $item];
+                    $this->listCategoryDefaultContent[$partPath][$contentIndex] = $value;
+                    $this->listAllDefaultContent[$contentIndex] = $value;
                 }
             }
 
             if ($this->flattenValues) {
                 foreach ($this->listAllDefaultContent as $index => $item) {
-                    if (isset($this->flattenValues[$item['index']]) && !isset($this->values[$item['type']][$item['index']])) {
-                        $this->addInternalData($item['type'], $item['index'], $item['value']); // insert data
+                    // && !isset($this->values[$item['type']][$item['index']])
+                    if (!isset($this->flattenValues[$index])) {
+                        $this->addInternalData($item['type'], $index, $item['value']); // insert data
                     }
                 }
             }

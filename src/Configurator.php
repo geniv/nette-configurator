@@ -5,6 +5,7 @@ namespace Configurator;
 use Exception;
 use Nette\Application\UI\Control;
 use Locale\ILocale;
+use Nette\Neon\Neon;
 use Nette\Utils\Finder;
 use SplFileInfo;
 
@@ -27,7 +28,7 @@ abstract class Configurator extends Control implements IConfigurator
     /** @var string */
     private $searchMask;
     /** @var array */
-    private $searchPath, $excludePath;
+    private $searchPath, $excludePath, $listDefaultContent, $listAllDefaultContent;
 
 
     /**
@@ -210,19 +211,22 @@ abstract class Configurator extends Control implements IConfigurator
                     $files[] = new SplFileInfo($path);
                 }
             }
-dump($files);
-//            // load all default translation files
-//            foreach ($files as $file) {
-//                $lengthPath = strlen(dirname(__DIR__, 4));
-//                $partPath = substr($file->getRealPath(), $lengthPath + 1);
-//
-//                $fileContent = (array) Neon::decode(file_get_contents($file->getPathname()));
-//                $this->listDefaultTranslate[$partPath] = $fileContent;  // collect all translate by dir
-//
-//                $messages = array_merge($messages, $fileContent);  // translate file may by empty
-//            }
-//            $this->listAllDefaultTranslate = $messages; // collect all translate
-//
+
+            // load all default translation files
+            foreach ($files as $file) {
+                $lengthPath = strlen(dirname(__DIR__, 4));
+                $partPath = substr($file->getRealPath(), $lengthPath + 1);
+
+                $fileContent = (array) Neon::decode(file_get_contents($file->getPathname()));
+
+                dump($fileContent);
+
+                $this->listDefaultContent[$partPath] = $fileContent;  // collect all translate by dir
+
+                $messages = array_merge($messages, $fileContent);  // translate file may by empty
+            }
+            $this->listAllDefaultContent = $messages; // collect all translate
+dump($this->listDefaultContent, $this->listAllDefaultContent);
 //            if ($this->dictionary) {
 //                // if define dictionary
 //                foreach ($messages as $identification => $message) {

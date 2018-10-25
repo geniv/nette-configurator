@@ -22,6 +22,17 @@ class Extension extends CompilerExtension
         'searchMask'  => '*Translation.neon',
         'searchPath'  => [],
         'excludePath' => [],
+        'saveType'    => [
+            ''     => 'translation',    // default type
+            'text' => 'text',
+            'tran' => 'translation',
+            'area' => 'textarea',
+            'edit' => 'editor',
+            'edim' => 'editormedia',
+            'bool' => 'bool',
+            'file' => 'file',
+            'imag' => 'image',
+        ],
     ];
 
 

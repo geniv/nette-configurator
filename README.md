@@ -39,6 +39,16 @@ configurator:
         - %appDir%/presenters/CustomTranslation.neon
 #    excludePath:
 #        - CustomExcludeTranslation.neon
+    saveType:
+        "": translation
+        text: text
+        tran: translation
+        area: textarea
+        edit: editor
+        edim: editormedia
+        bool: bool
+        file: file
+        imag: image
 ```
 
 neon configure extension:

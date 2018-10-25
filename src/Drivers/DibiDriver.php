@@ -215,7 +215,6 @@ class DibiDriver extends Configurator
                 $result = $this->connection->insert($this->tableConfiguratorIdent, $values)->execute(Dibi::IDENTIFIER);
             }
 
-            //Cache::EXPIRE => '30 minutes',
             try {
                 $this->cache->save($cacheKey, $result, [
                     Cache::TAGS => ['loadData'],

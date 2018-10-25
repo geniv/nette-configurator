@@ -14,21 +14,18 @@
 <div class="tracy-inner">
     <table>
         <caption>Used content</caption>
-        {*<tr>*}
-            {*<th>Identifier/ Configure</th>*}
-            {*<th>???</th>*}
-        {*</tr>*}
+        <tr>
+            <th>Identifier/ Configure</th>
+            <th>Translated</th>
+        </tr>
         <tr n:foreach="$listUsedContent as $ident => $item">
-            {*<td n:if="$used">*}
-                {*<a n:tag-ifset="$dictionary[$ident]" class="tracy-toggle tracy-collapsed" data-tracy-ref="^div .tracy-used-configure-ident-{$ident|webalize}">{$ident}</a>*}
-                {*<div n:ifset="$dictionary[$ident]" n:if="$used" class="tracy-used-configure-ident-{$ident|webalize} tracy-collapsed">{$dictionary[$ident]}</div>*}
-            {*</td>*}
-            {*<td n:if="!$used">*}
-                {*{$ident}*}
-            {*</td>*}
-            {*<td style="text-align: center;">*}
-                {*{if $used}{include #svgTrue}{else}{include #svgFalse}{/if}*}
-            {*</td>*}
+            <td>
+                <a class="tracy-toggle tracy-collapsed" data-tracy-ref="^div .tracy-used-configure-ident-{$ident|webalize}">{$ident}</a>
+                <div class="tracy-used-configure-ident-{$ident|webalize} tracy-collapsed">{$item['content']}</div>
+            </td>
+            <td style="text-align: center;">
+                {ifset $listAllContent[$ident]}{include #svgTrue}{else}{include #svgFalse}{/ifset}
+            </td>
         </tr>
         <tr n:if="!$iterations">
             <td colspan="2" style="text-align: center;">No configure items</td>
@@ -49,7 +46,7 @@
                     <tr n:foreach="$items as $ident => $item">
                         <td>
                             <a n:tag-ifset="$listAllContent[$ident]" class="tracy-toggle tracy-collapsed" data-tracy-ref="^div .tracy-default-configure-item-{$ident|webalize}">{$ident}</a>
-                            <div n:ifset="$listAllContent[$ident]" class="tracy-default-configure-item-{$ident|webalize} tracy-collapsed">{$item}</div>
+                            <div n:ifset="$listAllContent[$ident]" class="tracy-default-configure-item-{$ident|webalize} tracy-collapsed">{$item['value']}</div>
                         </td>
                         <td style="text-align: center;">
                             {ifset $listUsedContent[$ident]}{include #svgTrue}{else}{include #svgFalse}{/ifset}

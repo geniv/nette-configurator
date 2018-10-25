@@ -27,7 +27,7 @@ abstract class Configurator extends Control implements IConfigurator
     /** @var bool */
     private $autoCreate = true;
     /** @var array */
-    private $searchMask, $searchPath, $excludePath, $listCategoryDefaultContent, $listAllDefaultContent;
+    private $searchMask, $searchPath, $excludePath, $listCategoryContent, $listAllContent, $listUsedContent;
 
 
     /**
@@ -116,6 +116,7 @@ abstract class Configurator extends Control implements IConfigurator
             if (isset($this->values[$method])) {
                 $block = $this->values[$method];
                 if (isset($block[$ident])) {
+                    $this->listUsedContent[$ident] = $block[$ident];
                     if ($return) {
                         return ($block[$ident]['enable'] ? $block[$ident]['content'] : null);
                     }
@@ -198,7 +199,7 @@ abstract class Configurator extends Control implements IConfigurator
 
 
     /**
-     * Search default translate.
+     * Search default content.
      *
      * @param array $searchMask
      * @param array $searchPath
@@ -225,14 +226,14 @@ abstract class Configurator extends Control implements IConfigurator
                 }
             }
 
-            // load all default translation files
+            // load all default content files
             foreach ($files as $file) {
                 $lengthPath = strlen(dirname(__DIR__, 4));
                 $partPath = substr($file->getRealPath(), $lengthPath + 1);
                 // load neon file
                 $fileContent = (array) Neon::decode(file_get_contents($file->getPathname()));
                 // prepare empty row
-                $this->listCategoryDefaultContent[$partPath] = [];
+                $this->listCategoryContent[$partPath] = [];
                 // decode type logic
                 $defaultType = 'translation';
                 foreach ($fileContent as $index => $item) {
@@ -242,19 +243,19 @@ abstract class Configurator extends Control implements IConfigurator
                     // content index
                     $contentIndex = Strings::replace($index, ['#@[a-z]+@#' => '']);
                     $value = ['type' => $contentType ?: $defaultType, 'value' => $item];
-                    $this->listCategoryDefaultContent[$partPath][$contentIndex] = $value;
-                    $this->listAllDefaultContent[$contentIndex] = $value;
+                    $this->listCategoryContent[$partPath][$contentIndex] = $value;
+                    $this->listAllContent[$contentIndex] = $value;
                 }
             }
 
             if ($this->flattenValues) {
-                foreach ($this->listAllDefaultContent as $index => $item) {
-                    if ($item['type'] != 'translation') {
-                        if (isset($this->flattenValues[$index]) && $this->flattenValues[$index]['content'] == $this->getDefaultContent($item['type'], $index)) {
-                            // call only not translation, exist index, value is default
-                            $this->addInternalData($item['type'], $index, $item['value']); // insert data
-                        }
+                foreach ($this->listAllContent as $index => $item) {
+//                    if ($item['type'] != 'translation') {
+                    if (isset($this->flattenValues[$index]) && $this->flattenValues[$index]['content'] == $this->getDefaultContent($item['type'], $index)) {
+                        // call only not translation, exist index, value is default
+                        $this->addInternalData($item['type'], $index, $item['value']); // insert data
                     }
+//                    }
                 }
             }
         }
@@ -262,24 +263,35 @@ abstract class Configurator extends Control implements IConfigurator
 
 
     /**
-     * Get list category default content.
+     * Get list used content.
      *
      * @return array
      */
-    public function getListCategoryDefaultContent(): array
+    public function getListUsedContent(): array
     {
-        return $this->listCategoryDefaultContent;
+        return $this->listUsedContent;
     }
 
 
     /**
-     * Get list all default content.
+     * Get list category content.
      *
      * @return array
      */
-    public function getListAllDefaultContent(): array
+    public function getListCategoryContent(): array
     {
-        return $this->listAllDefaultContent;
+        return $this->listCategoryContent;
+    }
+
+
+    /**
+     * Get list all content.
+     *
+     * @return array
+     */
+    public function getListAllContent(): array
+    {
+        return $this->listAllContent;
     }
 
 

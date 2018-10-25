@@ -255,7 +255,7 @@ class DibiDriver extends Configurator
             $values = [
                 'id_locale' => $this->idDefaultLocale,  // UQ 1/2 - always default create language
                 'id_ident'  => $idIdentification,       // UQ 2/2
-                'content'   => ($content ?: '## ' . $type . ' - ' . $identification . ' ##'),
+                'content'   => ($content ?: $this->getDefaultContent($type, $identification)),
                 'enable'    => true,                    // always default enabled
             ];
             // only insert data

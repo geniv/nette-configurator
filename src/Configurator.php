@@ -170,6 +170,19 @@ abstract class Configurator extends Control implements IConfigurator
 
 
     /**
+     * Get default content.
+     *
+     * @param string $type
+     * @param string $identification
+     * @return string
+     */
+    protected function getDefaultContent(string $type, string $identification): string
+    {
+        return '## ' . $type . ' - ' . $identification . ' ##';
+    }
+
+
+    /**
      * Set path search.
      *
      * @param array $searchMask

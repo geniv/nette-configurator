@@ -23,11 +23,11 @@ abstract class Configurator extends Control implements IConfigurator
     /** @var ILocale */
     protected $locale;
     /** @var array */
-    protected $values, $flattenValues;
+    protected $values = [], $flattenValues = [];
     /** @var bool */
     private $autoCreate = true;
     /** @var array */
-    private $searchMask, $searchPath, $excludePath, $listCategoryContent, $listAllContent, $listUsedContent;
+    private $searchMask, $searchPath, $excludePath, $listCategoryContent = [], $listAllContent = [], $listUsedContent = [];
 
 
     /**

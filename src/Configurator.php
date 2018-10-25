@@ -3,8 +3,8 @@
 namespace Configurator;
 
 use Exception;
-use Nette\Application\UI\Control;
 use Locale\ILocale;
+use Nette\Application\UI\Control;
 use Nette\Neon\Neon;
 use Nette\Utils\Finder;
 use Nette\Utils\Strings;
@@ -249,47 +249,47 @@ abstract class Configurator extends Control implements IConfigurator
 
             if ($this->flattenValues) {
                 foreach ($this->listAllDefaultContent as $index => $item) {
-                    // && !isset($this->values[$item['type']][$item['index']])
-                    if (!isset($this->flattenValues[$index])) {
-                        $this->addInternalData($item['type'], $index, $item['value']); // insert data
+                    if ($item['type'] != 'translation') {
+                        if (isset($this->flattenValues[$index]) && $this->flattenValues[$index]['content'] == $this->getDefaultContent($item['type'], $index)) {
+                            // call only not translation, exist index, value is default
+                            $this->addInternalData($item['type'], $index, $item['value']); // insert data
+                        }
                     }
                 }
             }
-
-//            dump($this->listDefaultContent, $this->listAllDefaultContent);
-
-//            if ($this->dictionary) {
-//                // if define dictionary
-//                foreach ($messages as $identification => $message) {
-//                    // save only not exist identification and only string message or identification is same like dictionary index (default translate)
-//                    if ((!isset($this->dictionary[$identification]) && !is_array($message)) || $this->dictionary[$identification] == $identification) {
-//                        // call only save default value load from files
-//                        $this->saveTranslate($identification, $message);
-//                    }
-//                }
-//            }
         }
     }
 
 
-//    /**
-//     * Get list default translate.
-//     *
-//     * @return array
-//     */
-//    public function getListDefaultTranslate(): array
-//    {
-//        return $this->listDefaultTranslate;
-//    }
+    /**
+     * Get list category default content.
+     *
+     * @return array
+     */
+    public function getListCategoryDefaultContent(): array
+    {
+        return $this->listCategoryDefaultContent;
+    }
 
 
-//    /**
-//     * Get list all default translate.
-//     *
-//     * @return array
-//     */
-//    public function getListAllDefaultTranslate(): array
-//    {
-//        return $this->listAllDefaultTranslate;
-//    }
+    /**
+     * Get list all default content.
+     *
+     * @return array
+     */
+    public function getListAllDefaultContent(): array
+    {
+        return $this->listAllDefaultContent;
+    }
+
+
+    /**
+     * Get flatten values.
+     *
+     * @return array
+     */
+    public function getFlattenValues(): array
+    {
+        return $this->flattenValues;
+    }
 }

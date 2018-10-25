@@ -5,6 +5,8 @@ namespace Configurator;
 use Exception;
 use Nette\Application\UI\Control;
 use Locale\ILocale;
+use Nette\Utils\Finder;
+use SplFileInfo;
 
 
 /**
@@ -191,24 +193,24 @@ abstract class Configurator extends Control implements IConfigurator
     {
         if ($searchPath) {
             $messages = [];
-//
-//            $files = [];
-//            foreach ($searchPath as $path) {
-//                // insert dirs
-//                if (is_dir($path)) {
-//                    $fil = [];
-//                    foreach (Finder::findFiles('*Translation.neon')->exclude($excludePath)->from($path) as $file) {
-//                        $fil[] = $file;
-//                    }
-//                    natsort($fil);  // natural sorting path
-//                    $files = array_merge($files, $fil);  // merge sort array
-//                }
-//                // insert file
-//                if (is_file($path)) {
-//                    $files[] = new SplFileInfo($path);
-//                }
-//            }
-//
+
+            $files = [];
+            foreach ($searchPath as $path) {
+                // insert dirs
+                if (is_dir($path)) {
+                    $fil = [];
+                    foreach (Finder::findFiles($searchMask)->exclude($excludePath)->from($path) as $file) {
+                        $fil[] = $file;
+                    }
+                    natsort($fil);  // natural sorting path
+                    $files = array_merge($files, $fil);  // merge sort array
+                }
+                // insert file
+                if (is_file($path)) {
+                    $files[] = new SplFileInfo($path);
+                }
+            }
+dump($files);
 //            // load all default translation files
 //            foreach ($files as $file) {
 //                $lengthPath = strlen(dirname(__DIR__, 4));

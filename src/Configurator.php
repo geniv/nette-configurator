@@ -243,16 +243,19 @@ abstract class Configurator extends Control implements IConfigurator
                     // content index
                     $contentIndex = Strings::replace($index, ['#@[a-z]+@#' => '']);
                     $value = ['type' => $contentType ?: $defaultType, 'value' => $item];
-                    $this->listCategoryContent[$partPath][$contentIndex] = $value;
-                    $this->listAllContent[$contentIndex] = $value;
+                    if ($contentType) {
+                        // select except translation
+                        $this->listCategoryContent[$partPath][$contentIndex] = $value;
+                        $this->listAllContent[$contentIndex] = $value;
+                    }
                 }
             }
 
             if ($this->flattenValues) {
                 // list all content
                 foreach ($this->listAllContent as $index => $item) {
-                    // call only values not exist or values is default value
-                    if (!isset($this->flattenValues[$index]) || $this->flattenValues[$index]['content'] == $this->getDefaultContent($item['type'], $index)) {
+                    // call only values exist and values is default ## value
+                    if (isset($this->flattenValues[$index]) && $this->flattenValues[$index]['content'] == $this->getDefaultContent($item['type'], $index)) {
                         $this->addInternalData($item['type'], $index, $item['value']); // insert data
                     }
                 }

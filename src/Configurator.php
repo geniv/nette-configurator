@@ -7,6 +7,7 @@ use Nette\Application\UI\Control;
 use Locale\ILocale;
 use Nette\Neon\Neon;
 use Nette\Utils\Finder;
+use Nette\Utils\Strings;
 use SplFileInfo;
 
 
@@ -26,7 +27,7 @@ abstract class Configurator extends Control implements IConfigurator
     /** @var bool */
     private $autoCreate = true;
     /** @var array */
-    private $searchMask, $searchPath, $excludePath, $listDefaultContent, $listAllDefaultContent;
+    private $searchMask, $searchPath, $excludePath, $listCategoryDefaultContent, $listAllDefaultContent;
 
 
     /**
@@ -192,7 +193,7 @@ abstract class Configurator extends Control implements IConfigurator
     private function searchDefaultContent(array $searchMask, array $searchPath = [], array $excludePath = [])
     {
         if ($searchMask && $searchPath) {
-            $messages = [];
+//            $messages = [];
 
             $files = [];
             foreach ($searchPath as $path) {
@@ -218,15 +219,34 @@ abstract class Configurator extends Control implements IConfigurator
 
                 $fileContent = (array) Neon::decode(file_get_contents($file->getPathname()));
 
-dump($fileContent);
-
-                $this->listDefaultContent[$partPath] = $fileContent;  // collect all translate by dir
-
-                $messages = array_merge($messages, $fileContent);  // translate file may by empty
+                // decode type logic
+                $defaultType = 'translation';
+                foreach ($fileContent as $index => $item) {
+                    $indexType = Strings::match($index, '#@[a-z]+@#');
+                    $contentType = Strings::trim(implode((array) $indexType), '@');
+                    $contentIndex = Strings::replace($index, ['#@[a-z]+@#' => '']);
+                    $value = ['type' => $contentType ?: $defaultType, 'index' => $contentIndex, 'value' => $item];
+                    $this->listCategoryDefaultContent[$partPath][$index] = $value;
+                    $this->listAllDefaultContent[$index] = $value;
+                }
             }
-            $this->listAllDefaultContent = $messages; // collect all translate
+//            $this->listAllDefaultContent = $messages; // collect all translate
 
-dump($this->listDefaultContent, $this->listAllDefaultContent);
+            dump($this->listCategoryDefaultContent, $this->listAllDefaultContent);
+
+            if ($this->values) {
+                dump($this->values);
+                dump($this->listAllDefaultContent);
+                foreach ($this->listAllDefaultContent as $index => $item) {
+                    if (isset($this->values[$item['type']]) && $this->values[$item['type']]) {
+                        $this->addInternalData($item['type'], $item['index'], $item['value']); // insert data
+                    }
+                }
+
+            }
+
+
+//            dump($this->listDefaultContent, $this->listAllDefaultContent);
 
 //            if ($this->dictionary) {
 //                // if define dictionary

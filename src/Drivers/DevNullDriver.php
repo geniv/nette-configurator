@@ -10,8 +10,6 @@ use Locale\ILocale;
 /**
  * Class DevNullDriver
  *
- * /Dev/Null translator with support plurals without storage.
- *
  * @author  geniv
  * @package Configurator\Drivers
  */

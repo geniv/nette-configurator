@@ -55,6 +55,7 @@ abstract class Configurator extends Control implements IConfigurator
         $this->autoCreate = $status;
         return $this;
     }
+//TODO globalize search files to self class
 
 
     /**

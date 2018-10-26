@@ -4,7 +4,6 @@ namespace Configurator\Drivers;
 
 use Configurator\Configurator;
 use Dibi\Fluent;
-use Locale\ILocale;
 
 
 /**

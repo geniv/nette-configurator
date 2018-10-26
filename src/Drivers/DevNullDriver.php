@@ -78,7 +78,8 @@ class DevNullDriver extends Configurator
      */
     protected function addInternalData(string $type, string $identification, string $content = ''): int
     {
-        // TODO: Implement addInternalData() method.
+        $this->values[$type][$identification] = ['content' => $content, 'enable' => true];
+        return 1;
     }
 
 
@@ -90,6 +91,9 @@ class DevNullDriver extends Configurator
     protected function loadInternalData()
     {
         // TODO: Implement loadInternalData() method.
+
+        // set fake translate
+        $this->flattenValues['__DevNullDriver__'] = true;
     }
 
 
@@ -101,6 +105,7 @@ class DevNullDriver extends Configurator
     public function getListIdent(): array
     {
         // TODO: Implement getListIdent() method.
+        return [];
     }
 
 
@@ -137,6 +142,7 @@ class DevNullDriver extends Configurator
     public function getListDataType(): array
     {
         // TODO: Implement getListDataType() method.
+        return [];
     }
 
 
@@ -150,6 +156,7 @@ class DevNullDriver extends Configurator
     public function getDataById(int $idIdent, int $idLocale = null): array
     {
         // TODO: Implement getDataById() method.
+        return [];
     }
 
 
@@ -199,5 +206,6 @@ class DevNullDriver extends Configurator
     public function getDataByIdent(string $ident, int $idLocale = null): array
     {
         // TODO: Implement getDataByIdent() method.
+        return [];
     }
 }

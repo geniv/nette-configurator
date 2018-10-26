@@ -255,8 +255,8 @@ abstract class Configurator extends Control implements IConfigurator
             if ($this->flattenValues) {
                 // list all content
                 foreach ($this->listAllContent as $index => $item) {
-                    // call only values exist and values is default ## value
-                    if (isset($this->flattenValues[$index]) && $this->flattenValues[$index]['content'] == $this->getDefaultContent($item['type'], $index)) {
+                    // call only if values does not exist or values is default ## value
+                    if (!isset($this->flattenValues[$index]) || $this->flattenValues[$index]['content'] == $this->getDefaultContent($item['type'], $index)) {
                         $this->addInternalData($item['type'], $index, $item['value']); // insert data
                     }
                 }

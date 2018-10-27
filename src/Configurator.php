@@ -94,9 +94,12 @@ abstract class Configurator extends Control implements IConfigurator
 
             // enable method
             if (substr($name, 0, 8) == 'isEnable') {
+
+                return ($this->values[$ident]['enable'] ?? false);
+
                 $method = strtolower(substr($name, 8));
-                if (isset($this->values[$method][$ident])) {
-                    $block = $this->values[$method][$ident];
+                if (isset($this->values[$ident])) {
+                    $block = $this->values[$ident];
                     return $block['enable'];    // return enable state
                 }
             }

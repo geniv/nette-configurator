@@ -252,7 +252,7 @@ class DibiDriver extends Configurator
         $arr = ['ident' => $identification, 'type' => $type];
         // load identification
         $idIdentification = $this->getInternalIdIdentification($arr);
-
+//FIXME prepsat!!
         // check exist configure id
         $conf = $this->connection->select('id')
             ->from($this->tableConfigurator)
@@ -289,14 +289,6 @@ class DibiDriver extends Configurator
         $this->values = $this->cache->load($cacheKey);
         if ($this->values === null) {
             $this->values = $this->getListData()->fetchAssoc('ident');
-
-//            $types = $this->getListDataType();
-//            // load rows by type
-//            foreach ($types as $type) {
-//                $items = $this->getListDataByType($type);
-//                $this->values[$type] = $items->fetchAssoc('ident');
-//            }
-
             try {
                 $this->cache->save($cacheKey, $this->values, [
                     Cache::TAGS => ['loadData'],
@@ -304,17 +296,5 @@ class DibiDriver extends Configurator
             } catch (\Throwable $e) {
             }
         }
-
-//        $cacheKeyFlatten = 'flattenValues' . $this->locale->getId();
-//        $this->flattenValues = $this->cache->load($cacheKeyFlatten);
-//        if ($this->flattenValues === null) {
-//            try {
-//                $this->flattenValues = Arrays::flatten($this->values, true);
-//                $this->cache->save($cacheKeyFlatten, $this->flattenValues, [
-//                    Cache::TAGS => ['loadData'],
-//                ]);
-//            } catch (\Throwable $e) {
-//            }
-//        }
     }
 }

@@ -181,12 +181,14 @@ class DibiDriver extends Configurator
     /**
      * Get data by ident.
      *
+     * @deprecated
      * @param string   $ident
      * @param int|null $idLocale
      * @return array
      */
     public function getDataByIdent(string $ident, int $idLocale = null): array
     {
+        //FIXME funcguje stejne jako getValue()
         $cacheKey = 'getDataByIdent' . $ident . $idLocale;
         $result = $this->cache->load($cacheKey);
         if ($result === null) {

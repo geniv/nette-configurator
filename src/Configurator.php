@@ -98,8 +98,7 @@ abstract class Configurator extends Control implements IConfigurator
         if (!in_array($name, ['onAnchor'])) {   // exclude method
             if ($this->locale->isReady() && !$this->values) {
 //                \Tracy\Debugger::fireLog('Configurator::__call');
-                // load data
-                $this->loadInternalData();
+                $this->loadInternalData();  // load data
                 // process default content
                 $this->searchDefaultContent($this->searchMask, $this->searchPath, $this->excludePath);
             }
@@ -108,8 +107,6 @@ abstract class Configurator extends Control implements IConfigurator
                 throw new Exception('Identification parameter is not used.');
             }
             $ident = $args[0];  // load identification
-            $type = strtolower(substr($name, 6)); // load type name
-            $return = (isset($args[1]) ? $args[1] : false); // load result
 
             // setter - set method (extended for translator)
             if (substr($name, 0, 3) == 'set' && isset($ident) && isset($args[1])) {
@@ -118,28 +115,19 @@ abstract class Configurator extends Control implements IConfigurator
                 return $args[1];    // return message only by create new translate
             }
 
-//            // enable method
-//            if (substr($name, 0, 8) == 'isEnable') {
-//                return ($this->values[$ident]['enable'] ?? false);  // return enable state
-//            }
-
-//            // getter - get method
-//            if (substr($name, 0, 3) == 'get' && isset($ident)) {
-//                $type = strtolower(substr($name, 3));     // modify type name
-//                $return = true;     // set only return
-//            }
-
             // create
             if ($this->autoCreate && (!isset($this->values[$ident]))) {
-                $this->addInternalData($type, $ident);    // insert
+                $type = strtolower(substr($name, 6)); // load type name
+                $this->addInternalData($type, $ident);      // insert
                 $this->loadInternalData();                  // reloading
             }
 
             // load value
             if (isset($this->values[$ident])) {
                 $value = $this->values[$ident];
-                $this->listUsedContent[$ident] = $value;    // add use value
-                if ($return) {
+                $this->listUsedContent[$ident] = $value;    // add to use
+                if ($args[1] ?? false) {
+                    // return for renderXXX
                     return ($value['enable'] ? $value['content'] : null);
                 }
                 echo($value['enable'] ? $value['content'] : null);

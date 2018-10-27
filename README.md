@@ -23,6 +23,7 @@ Include in application
 ----------------------
 
 available source drivers:
+- DevNullDriver (default values)
 - DibiDriver (dibi + cache)
 
 neon configure:
@@ -63,25 +64,16 @@ protected function createComponentConfig(Configurator $configurator)
 ```
 
 ```php
-// return bool of enabled ident
-$this['config']->isEnableText('ident');
-$this['config']->isEnable('ident');
+$this['config']->isEnable('ident'): bool;
+$this['config']->getValue('ident'): mixed;
 
 // echo value of ident
 $this['config']->renderText('ident');
-
 // return value of ident
 $this['config']->renderText('ident', true);
 
-// direct return value
-$this['config']->getText('ident');
-
-// return value of show-web-title (long equivalent)
-$this['config']->renderCheckbox('show-web-title', true);
-
 // set data like translator
-$presenter['config']->setTranslator('ident', 'text');
-
+$this['config']->setTranslator('ident', 'text');
 $this['config']->setEditor('ident', 'new text');
 
 $this['config']->getDataByIdent('ident');
@@ -93,10 +85,10 @@ usage:
 
 {control config:text 'web-title', true}
 
-<h1 n:if="$presenter['config']->isEnableText('web-title')">{control config:text 'web-title'}</h1>
+<h1 n:if="$presenter['config']->isEnable('web-title')">{control config:text 'web-title'}</h1>
 
-<h1 n:if="$presenter['config']->getCheckbox('show-web-title')">{control config:text 'web-title'}</h1>
+<h1 n:if="$presenter['config']->getValue('show-web-title')">{control config:text 'web-title'}</h1>
 
-{* long equivalent: *}
+{* long equivalent - WHY?!: *}
 <h1 n:if="$presenter['config']->renderCheckbox('show-web-title', true)">{control config:text 'web-title'}</h1>
 ```

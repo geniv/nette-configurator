@@ -26,7 +26,7 @@ class DevNullDriver extends Configurator
      */
     protected function saveInternalData(string $type, string $identification, string $content = ''): int
     {
-        $this->values[$identification] = ['type' => $type, 'content' => $content, 'enable' => true];
+        $this->values[$identification] = ['ident' => $identification, 'type' => $type, 'content' => $content, 'enable' => true];
         return 1;
     }
 

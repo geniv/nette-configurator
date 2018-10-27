@@ -87,21 +87,14 @@ abstract class Configurator extends Control implements IConfigurator
 
             // setter - set method (extended for translator)
             if (substr($name, 0, 3) == 'set' && isset($ident) && isset($args[1])) {
-                $method = strtolower(substr($name, 3));
-                $this->addInternalData($method, $ident, $args[1]); // insert data
+                $type = strtolower(substr($name, 3));
+                $this->addInternalData($type, $ident, $args[1]); // insert data
                 return $args[1];    // return message only by create new translate
             }
 
             // enable method
             if (substr($name, 0, 8) == 'isEnable') {
-
-                return ($this->values[$ident]['enable'] ?? false);
-
-                $method = strtolower(substr($name, 8));
-                if (isset($this->values[$ident])) {
-                    $block = $this->values[$ident];
-                    return $block['enable'];    // return enable state
-                }
+                return ($this->values[$ident]['enable'] ?? false);  // return enable state
             }
 
             // getter - get method
@@ -111,25 +104,21 @@ abstract class Configurator extends Control implements IConfigurator
             }
 
             // create
-            if ($this->autoCreate && (!isset($this->values[$method]) || !isset($this->values[$method][$ident]))) {
+            if ($this->autoCreate && (!isset($this->values[$ident]))) {
                 $this->addInternalData($method, $ident);    // insert
                 $this->loadInternalData();                  // reloading
             }
 
             // load value
-            if (isset($this->values[$method])) {
-                $block = $this->values[$method];
-                if (isset($block[$ident])) {
-                    $this->listUsedContent[$ident] = $block[$ident];
-                    if ($return) {
-                        return ($block[$ident]['enable'] ? $block[$ident]['content'] : null);
-                    }
-                    echo($block[$ident]['enable'] ? $block[$ident]['content'] : null);
-                } else {
-                    throw new Exception('Identification "' . $method . ':' . $ident . '" does not eixst.');
+            if (isset($this->values[$ident])) {
+                $value = $this->values[$ident];
+                $this->listUsedContent[$ident] = $value;    // add use value
+                if ($return) {
+                    return ($value['enable'] ? $value['content'] : null);
                 }
+                echo($value['enable'] ? $value['content'] : null);
             } else {
-                throw new Exception('Invalid block. Block: "' . $method . '" does not exists.');
+                throw new Exception('Identification "' . $ident . '" does not exist.');
             }
         }
         return null;

@@ -38,7 +38,7 @@ class ConfiguratorTranslator extends Translator
 
         $this->configurator = $configurator;
 
-        $this->cache = new Cache($storage, 'Translator-Drivers-ConfiguratorDriver');
+        $this->cache = new Cache($storage, 'Configurator-ConfiguratorTranslator');
     }
 
 

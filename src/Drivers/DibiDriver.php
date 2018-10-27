@@ -49,7 +49,7 @@ class DibiDriver extends Configurator
         $this->tableConfiguratorIdent = $prefix . self::TABLE_NAME_IDENT;
 
         $this->connection = $connection;
-        $this->cache = new Cache($storage, 'Configurator');
+        $this->cache = new Cache($storage, 'Configurator-DibiDriver');
     }
 
 

@@ -15,38 +15,6 @@ use Dibi\Fluent;
 class DevNullDriver extends Configurator
 {
 
-//    /**
-//     * DevNullDriver constructor.
-//     *
-//     * @param ILocale $locale
-//     */
-//    public function __construct(ILocale $locale)
-//    {
-//        parent::__construct($locale);
-//    }
-//    /**
-//     * Load translate.
-//     */
-//    protected function loadTranslate()
-//    {
-//        // set fake translate for enable searchDefaultTranslate()
-//        $this->dictionary['__DevNullDriver__'] = true;
-//    }
-//    /**
-//     * Save translate.
-//     *
-//     * @param string $identification
-//     * @param        $message
-//     * @param null   $idLocale
-//     * @return string
-//     */
-//    protected function saveTranslate(string $identification, $message, $idLocale = null): string
-//    {
-//        $this->dictionary[$identification] = $message;  // save to only variable
-//        return $message;
-//    }
-
-
     /**
      * Get internal id identification.
      *
@@ -58,7 +26,6 @@ class DevNullDriver extends Configurator
     {
         // TODO: Implement getInternalIdIdentification() method.
     }
-//TODO nacteni textu z hledani a pouzi ty!!!
 
 
     /**
@@ -166,6 +133,7 @@ class DevNullDriver extends Configurator
     public function editData(int $id, array $values): int
     {
         // TODO: Implement editData() method.
+        return 0;
     }
 
 
@@ -179,6 +147,7 @@ class DevNullDriver extends Configurator
     public function deleteData(int $id): int
     {
         // TODO: Implement deleteData() method.
+        return 0;
     }
 
 

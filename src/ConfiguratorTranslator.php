@@ -48,6 +48,7 @@ class ConfiguratorTranslator extends Translator
 //        \Tracy\Debugger::fireLog('ConfiguratorDriver::loadTranslate; cacheKey ' . $cacheKey);
         $this->dictionary = $this->cache->load($cacheKey);
         if ($this->dictionary === null) {
+//FIXME opravit nacitani list data!!!!
             $this->dictionary = $this->configurator->getListData()->fetchPairs('ident', 'content');
             try {
                 $this->cache->save($cacheKey, $this->dictionary, [

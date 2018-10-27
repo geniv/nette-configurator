@@ -55,7 +55,33 @@ abstract class Configurator extends Control implements IConfigurator
         $this->autoCreate = $status;
         return $this;
     }
+
+
 //TODO globalize search files to self class
+
+
+    /**
+     * Is enable.
+     *
+     * @param string $identification
+     * @return bool
+     */
+    public function isEnable(string $identification): bool
+    {
+        return ($this->values[$identification]['enable'] ?? false);
+    }
+
+
+    /**
+     * Get value.
+     *
+     * @param string $identification
+     * @return mixed
+     */
+    public function getValue(string $identification)
+    {
+        return ($this->values[$identification] ?? null);
+    }
 
 
     /**
@@ -82,7 +108,7 @@ abstract class Configurator extends Control implements IConfigurator
                 throw new Exception('Identification parameter is not used.');
             }
             $ident = $args[0];  // load identification
-            $method = strtolower(substr($name, 6)); // load method name
+            $type = strtolower(substr($name, 6)); // load type name
             $return = (isset($args[1]) ? $args[1] : false); // load result
 
             // setter - set method (extended for translator)
@@ -92,20 +118,20 @@ abstract class Configurator extends Control implements IConfigurator
                 return $args[1];    // return message only by create new translate
             }
 
-            // enable method
-            if (substr($name, 0, 8) == 'isEnable') {
-                return ($this->values[$ident]['enable'] ?? false);  // return enable state
-            }
+//            // enable method
+//            if (substr($name, 0, 8) == 'isEnable') {
+//                return ($this->values[$ident]['enable'] ?? false);  // return enable state
+//            }
 
-            // getter - get method
-            if (substr($name, 0, 3) == 'get' && isset($ident)) {
-                $method = strtolower(substr($name, 3));     // modify name
-                $return = true;     // set only return
-            }
+//            // getter - get method
+//            if (substr($name, 0, 3) == 'get' && isset($ident)) {
+//                $type = strtolower(substr($name, 3));     // modify type name
+//                $return = true;     // set only return
+//            }
 
             // create
             if ($this->autoCreate && (!isset($this->values[$ident]))) {
-                $this->addInternalData($method, $ident);    // insert
+                $this->addInternalData($type, $ident);    // insert
                 $this->loadInternalData();                  // reloading
             }
 

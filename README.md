@@ -65,6 +65,7 @@ protected function createComponentConfig(Configurator $configurator)
 ```php
 // return bool of enabled ident
 $this['config']->isEnableText('ident');
+$this['config']->isEnable('ident');
 
 // echo value of ident
 $this['config']->renderText('ident');

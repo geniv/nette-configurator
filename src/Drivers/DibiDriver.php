@@ -183,13 +183,19 @@ class DibiDriver extends Configurator
      */
     public function getDataByIdent(string $ident, int $idLocale = null): array
     {
-        if (isset($this->flattenValues[$ident])) {
-            return (array) $this->flattenValues[$ident];
-        } else {
+        $cacheKey = 'getDataByIdent' . $ident . $idLocale;
+        $result = $this->cache->load($cacheKey);
+        if ($result === null) {
             $result = $this->getListData($idLocale)
                 ->where(['ci.ident' => $ident]);
-            return (array) ($result->fetch() ?: []);
+            try {
+                $this->cache->save($cacheKey, $result->fetch(), [
+                    Cache::TAGS => ['loadData'],
+                ]);
+            } catch (\Throwable $e) {
+            }
         }
+        return (array) $result;
     }
 
 
@@ -275,16 +281,17 @@ class DibiDriver extends Configurator
      */
     protected function loadInternalData()
     {
-        $cacheKey = 'values' . $this->locale->getId();
+        $cacheKey = 'loadInternalData' . $this->locale->getId();
         $this->values = $this->cache->load($cacheKey);
         if ($this->values === null) {
-            $types = $this->getListDataType();
+            $this->values = $this->getListData()->fetchAssoc('ident');
 
-            // load rows by type
-            foreach ($types as $type) {
-                $items = $this->getListDataByType($type);
-                $this->values[$type] = $items->fetchAssoc('ident');
-            }
+//            $types = $this->getListDataType();
+//            // load rows by type
+//            foreach ($types as $type) {
+//                $items = $this->getListDataByType($type);
+//                $this->values[$type] = $items->fetchAssoc('ident');
+//            }
 
             try {
                 $this->cache->save($cacheKey, $this->values, [
@@ -294,16 +301,16 @@ class DibiDriver extends Configurator
             }
         }
 
-        $cacheKeyFlatten = 'flattenValues' . $this->locale->getId();
-        $this->flattenValues = $this->cache->load($cacheKeyFlatten);
-        if ($this->flattenValues === null) {
-            try {
-                $this->flattenValues = Arrays::flatten($this->values, true);
-                $this->cache->save($cacheKeyFlatten, $this->flattenValues, [
-                    Cache::TAGS => ['loadData'],
-                ]);
-            } catch (\Throwable $e) {
-            }
-        }
+//        $cacheKeyFlatten = 'flattenValues' . $this->locale->getId();
+//        $this->flattenValues = $this->cache->load($cacheKeyFlatten);
+//        if ($this->flattenValues === null) {
+//            try {
+//                $this->flattenValues = Arrays::flatten($this->values, true);
+//                $this->cache->save($cacheKeyFlatten, $this->flattenValues, [
+//                    Cache::TAGS => ['loadData'],
+//                ]);
+//            } catch (\Throwable $e) {
+//            }
+//        }
     }
 }

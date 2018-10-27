@@ -59,7 +59,7 @@ class Panel implements IBarPanel
             'listUsedContent'     => $this->configurator->getListUsedContent(),     // list used content index
             'listAllContent'      => $this->configurator->getListAllContent(),      // list all content
             'listCategoryContent' => $this->configurator->getListCategoryContent(), // list category content
-            'flattenValues'       => $this->configurator->getFlattenValues(),       // list values
+            //            'values'              => $this->configurator->getValues(),       // list values
         ];
         $latte = new Engine;
         return $latte->renderToString(__DIR__ . '/PanelTemplate.latte', $params);

@@ -92,7 +92,7 @@ class DevNullDriver extends Configurator
         // TODO: Implement loadInternalData() method.
 
         // set fake translate
-        $this->flattenValues['__DevNullDriver__'] = true;
+        $this->values['__DevNullDriver__'] = true;
     }
 
 

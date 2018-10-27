@@ -23,7 +23,7 @@ abstract class Configurator extends Control implements IConfigurator
     /** @var ILocale */
     protected $locale;
     /** @var array */
-    protected $values = [], $flattenValues = [];
+    protected $values = [];
     /** @var bool */
     private $autoCreate = true;
     /** @var array */
@@ -252,11 +252,11 @@ abstract class Configurator extends Control implements IConfigurator
                 }
             }
 
-            if ($this->flattenValues) {
+            if ($this->values) {
                 // list all content
                 foreach ($this->listAllContent as $index => $item) {
                     // call only if values does not exist or values is default ## value
-                    if (!isset($this->flattenValues[$index]) || $this->flattenValues[$index]['content'] == $this->getDefaultContent($item['type'], $index)) {
+                    if (!isset($this->values[$index]) || $this->values[$index]['content'] == $this->getDefaultContent($item['type'], $index)) {
                         $this->addInternalData($item['type'], $index, $item['value']); // insert data
                     }
                 }
@@ -299,12 +299,12 @@ abstract class Configurator extends Control implements IConfigurator
 
 
     /**
-     * Get flatten values.
+     * Get values.
      *
      * @return array
      */
-    public function getFlattenValues(): array
+    public function getValues(): array
     {
-        return $this->flattenValues;
+        return $this->values;
     }
 }

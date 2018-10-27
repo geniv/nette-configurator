@@ -60,18 +60,6 @@ class DevNullDriver extends Configurator
 
 
     /**
-     * Get list ident.
-     *
-     * @return array
-     */
-    public function getListIdent(): array
-    {
-        // TODO: Implement getListIdent() method.
-        return [];
-    }
-
-
-    /**
      * Get list data.
      *
      * @param int|null $idLocale
@@ -84,55 +72,14 @@ class DevNullDriver extends Configurator
 
 
     /**
-     * Get list data by type.
-     *
-     * @param string   $type
-     * @param int|null $idLocale
-     * @return Fluent
-     */
-    public function getListDataByType(string $type, int $idLocale = null): Fluent
-    {
-        // TODO: Implement getListDataByType() method.
-    }
-
-
-    /**
-     * Get list data type.
-     *
-     * @return array
-     */
-    public function getListDataType(): array
-    {
-        // TODO: Implement getListDataType() method.
-        return [];
-    }
-
-
-    /**
-     * Get data by id.
-     *
-     * @param int      $idIdent
-     * @param int|null $idLocale
-     * @return array
-     */
-    public function getDataById(int $idIdent, int $idLocale = null): array
-    {
-        // TODO: Implement getDataById() method.
-        return [];
-    }
-
-
-    /**
      * Edit data.
      *
      * @param int   $id
      * @param array $values
      * @return int
-     * @throws \Dibi\Exception
      */
     public function editData(int $id, array $values): int
     {
-        // TODO: Implement editData() method.
         return 0;
     }
 

@@ -16,9 +16,6 @@ use Translator\Translator;
  */
 class ConfiguratorTranslator extends Translator
 {
-    const
-        TRANSLATION_IDENTIFICATION = 'translation';
-
     /** @var IConfigurator */
     private $configurator;
     /** @var Cache */

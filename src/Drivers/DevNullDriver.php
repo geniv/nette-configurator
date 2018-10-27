@@ -16,19 +16,6 @@ class DevNullDriver extends Configurator
 {
 
     /**
-     * Get internal id identification.
-     *
-     * @param array $values
-     * @return int
-     * @throws \Dibi\Exception
-     */
-    protected function getInternalIdIdentification(array $values): int
-    {
-        // TODO: Implement getInternalIdIdentification() method.
-    }
-
-
-    /**
      * Add internal data.
      *
      * @internal
@@ -36,9 +23,8 @@ class DevNullDriver extends Configurator
      * @param string $identification
      * @param string $content
      * @return int
-     * @throws \Dibi\Exception
      */
-    protected function addInternalData(string $type, string $identification, string $content = ''): int
+    protected function saveInternalData(string $type, string $identification, string $content = ''): int
     {
         $this->values[$identification] = ['type' => $type, 'content' => $content, 'enable' => true];
         return 1;
@@ -52,8 +38,6 @@ class DevNullDriver extends Configurator
      */
     protected function loadInternalData()
     {
-        // TODO: Implement loadInternalData() method.
-
         // set fake translate
         $this->values['__DevNullDriver__'] = true;
     }
@@ -67,7 +51,7 @@ class DevNullDriver extends Configurator
      */
     public function getListData(int $idLocale = null): Fluent
     {
-        // TODO: Implement getListData() method.
+        //
     }
 
 
@@ -89,11 +73,9 @@ class DevNullDriver extends Configurator
      *
      * @param int $id
      * @return int
-     * @throws \Dibi\Exception
      */
     public function deleteData(int $id): int
     {
-        // TODO: Implement deleteData() method.
         return 0;
     }
 
@@ -103,20 +85,5 @@ class DevNullDriver extends Configurator
      */
     public function cleanCache()
     {
-        // TODO: Implement cleanCache() method.
-    }
-
-
-    /**
-     * Get data by ident.
-     *
-     * @param string   $ident
-     * @param int|null $idLocale
-     * @return array
-     */
-    public function getDataByIdent(string $ident, int $idLocale = null): array
-    {
-        // TODO: Implement getDataByIdent() method.
-        return [];
     }
 }

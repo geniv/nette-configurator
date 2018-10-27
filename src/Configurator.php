@@ -57,9 +57,6 @@ abstract class Configurator extends Control implements IConfigurator
     }
 
 
-//TODO globalize search files to self class
-
-
     /**
      * Is enable.
      *
@@ -69,6 +66,17 @@ abstract class Configurator extends Control implements IConfigurator
     public function isEnable(string $identification): bool
     {
         return ($this->values[$identification]['enable'] ?? false);
+    }
+
+
+    /**
+     * Get values.
+     *
+     * @return array
+     */
+    public function getValues(): array
+    {
+        return $this->values ?? [];
     }
 
 
@@ -111,14 +119,14 @@ abstract class Configurator extends Control implements IConfigurator
             // setter - set method (extended for translator)
             if (substr($name, 0, 3) == 'set' && isset($ident) && isset($args[1])) {
                 $type = strtolower(substr($name, 3));
-                $this->addInternalData($type, $ident, $args[1]); // insert data
+                $this->saveInternalData($type, $ident, $args[1]); // insert data
                 return $args[1];    // return message only by create new translate
             }
 
             // create
             if ($this->autoCreate && (!isset($this->values[$ident]))) {
                 $type = strtolower(substr($name, 6)); // load type name
-                $this->addInternalData($type, $ident);      // insert
+                $this->saveInternalData($type, $ident);      // insert
                 $this->loadInternalData();                  // reloading
             }
 
@@ -140,17 +148,7 @@ abstract class Configurator extends Control implements IConfigurator
 
 
     /**
-     * Get internal id identification.
-     *
-     * @param array $values
-     * @return int
-     * @throws \Dibi\Exception
-     */
-    abstract protected function getInternalIdIdentification(array $values): int;
-
-
-    /**
-     * Add internal data.
+     * Save internal data.
      *
      * @internal
      * @param string $type
@@ -159,7 +157,7 @@ abstract class Configurator extends Control implements IConfigurator
      * @return int
      * @throws \Dibi\Exception
      */
-    abstract protected function addInternalData(string $type, string $identification, string $content = ''): int;
+    abstract protected function saveInternalData(string $type, string $identification, string $content = ''): int;
 
 
     /**
@@ -232,7 +230,7 @@ abstract class Configurator extends Control implements IConfigurator
                     $files[] = new SplFileInfo($path);
                 }
             }
-
+//TODO globalize search files to self class
             // load all default content files
             foreach ($files as $file) {
                 $lengthPath = strlen(dirname(__DIR__, 4));
@@ -263,7 +261,7 @@ abstract class Configurator extends Control implements IConfigurator
                 foreach ($this->listAllContent as $index => $item) {
                     // call only if values does not exist or values is default ## value
                     if (!isset($this->values[$index]) || $this->values[$index]['content'] == $this->getDefaultContent($item['type'], $index)) {
-                        $this->addInternalData($item['type'], $index, $item['value']); // insert data
+                        $this->saveInternalData($item['type'], $index, $item['value']); // insert data
                     }
                 }
             }
@@ -301,16 +299,5 @@ abstract class Configurator extends Control implements IConfigurator
     public function getListAllContent(): array
     {
         return $this->listAllContent;
-    }
-
-
-    /**
-     * Get values.
-     *
-     * @return array
-     */
-    public function getValues(): array
-    {
-        return $this->values;
     }
 }

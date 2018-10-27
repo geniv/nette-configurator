@@ -72,68 +72,6 @@ class DibiDriver extends Configurator
     }
 
 
-//    /**
-//     * Get list data by type.
-//     *
-//     * @deprecated
-//     * @param string   $type
-//     * @param int|null $idLocale
-//     * @return Fluent
-//     */
-//    public function getListDataByType(string $type, int $idLocale = null): Fluent
-//    {
-//        $result = $this->getListData($idLocale)
-//            ->where(['ci.type' => $type]);
-//        return $result;
-//    }
-
-
-//    /**
-//     * Get list data type.
-//     *
-//     * @deprecated
-//     * @return array
-//     */
-//    public function getListDataType(): array
-//    {
-//        return $this->connection->select('id, type')
-//            ->from($this->tableConfiguratorIdent)
-//            ->groupBy('type')
-//            ->orderBy(['type' => 'ASC'])
-//            ->fetchPairs('id', 'type');
-//    }
-
-
-//    /**
-//     * Get data by id.
-//     *
-//     * @deprecated
-//     * @param int      $idIdent
-//     * @param int|null $idLocale
-//     * @return array
-//     */
-//    public function getDataById(int $idIdent, int $idLocale = null): array
-//    {
-//        $result = $this->getListData($idLocale)
-//            ->where(['c.id_ident' => $idIdent]);
-//        return (array) ($result->fetch() ?: []);
-//    }
-
-
-//    /**
-//     * Get list ident.
-//     *
-//     * @deprecated
-//     * @return array
-//     */
-//    public function getListIdent(): array
-//    {
-//        return $this->connection->select('id, ident')
-//            ->from($this->tableConfiguratorIdent)
-//            ->fetchPairs('id', 'ident');
-//    }
-
-
     /**
      * Edit data.
      *
@@ -177,33 +115,6 @@ class DibiDriver extends Configurator
     }
 
 
-//    /**
-//     * Get data by ident.
-//     *
-//     * @deprecated
-//     * @param string   $ident
-//     * @param int|null $idLocale
-//     * @return array
-//     */
-//    public function getDataByIdent(string $ident, int $idLocale = null): array
-//    {
-//        //FIXME funcguje stejne jako getValue()
-//        $cacheKey = 'getDataByIdent' . $ident . $idLocale;
-//        $result = $this->cache->load($cacheKey);
-//        if ($result === null) {
-//            $result = $this->getListData($idLocale)
-//                ->where(['ci.ident' => $ident]);
-//            try {
-//                $this->cache->save($cacheKey, $result->fetch(), [
-//                    Cache::TAGS => ['loadData'],
-//                ]);
-//            } catch (\Throwable $e) {
-//            }
-//        }
-//        return (array) $result;
-//    }
-
-
     /**
      * Get internal id identification.
      *
@@ -239,7 +150,7 @@ class DibiDriver extends Configurator
 
 
     /**
-     * Add internal data.
+     * Save internal data.
      *
      * @internal
      * @param string $type
@@ -248,7 +159,7 @@ class DibiDriver extends Configurator
      * @return int
      * @throws \Dibi\Exception
      */
-    protected function addInternalData(string $type, string $identification, string $content = ''): int
+    protected function saveInternalData(string $type, string $identification, string $content = ''): int
     {
         $result = null;
         $arr = ['ident' => $identification, 'type' => $type];

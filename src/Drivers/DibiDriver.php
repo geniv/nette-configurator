@@ -76,6 +76,7 @@ class DibiDriver extends Configurator
     /**
      * Get list data by type.
      *
+     * @deprecated
      * @param string   $type
      * @param int|null $idLocale
      * @return Fluent
@@ -91,6 +92,7 @@ class DibiDriver extends Configurator
     /**
      * Get list data type.
      *
+     * @deprecated
      * @return array
      */
     public function getListDataType(): array
@@ -106,6 +108,7 @@ class DibiDriver extends Configurator
     /**
      * Get data by id.
      *
+     * @deprecated
      * @param int      $idIdent
      * @param int|null $idLocale
      * @return array
@@ -121,6 +124,7 @@ class DibiDriver extends Configurator
     /**
      * Get list ident.
      *
+     * @deprecated
      * @return array
      */
     public function getListIdent(): array

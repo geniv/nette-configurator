@@ -24,8 +24,6 @@ class DevNullDriver extends Configurator
 //    {
 //        parent::__construct($locale);
 //    }
-//
-//
 //    /**
 //     * Load translate.
 //     */
@@ -34,8 +32,6 @@ class DevNullDriver extends Configurator
 //        // set fake translate for enable searchDefaultTranslate()
 //        $this->dictionary['__DevNullDriver__'] = true;
 //    }
-//
-//
 //    /**
 //     * Save translate.
 //     *
@@ -77,7 +73,7 @@ class DevNullDriver extends Configurator
      */
     protected function addInternalData(string $type, string $identification, string $content = ''): int
     {
-        $this->values[$type][$identification] = ['content' => $content, 'enable' => true];
+        $this->values[$type][$identification] = ['type' => $type, 'content' => $content, 'enable' => true];
         return 1;
     }
 

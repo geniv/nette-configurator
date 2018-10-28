@@ -5,11 +5,10 @@ namespace Configurator\Drivers;
 use Configurator\Configurator;
 use dibi;
 use Dibi\Connection;
-use Dibi\Fluent;
+use Dibi\IDataSource;
 use Locale\ILocale;
 use Nette\Caching\Cache;
 use Nette\Caching\IStorage;
-use Nette\Utils\Arrays;
 
 
 /**
@@ -50,7 +49,7 @@ class DibiDriver extends Configurator
         $this->tableConfiguratorIdent = $prefix . self::TABLE_NAME_IDENT;
 
         $this->connection = $connection;
-        $this->cache = new Cache($storage, 'Configurator');
+        $this->cache = new Cache($storage, 'Configurator-DibiDriver');
     }
 
 
@@ -58,9 +57,9 @@ class DibiDriver extends Configurator
      * Get list data.
      *
      * @param int|null $idLocale
-     * @return Fluent
+     * @return IDataSource
      */
-    public function getListData(int $idLocale = null): Fluent
+    public function getListData(int $idLocale = null): IDataSource
     {
         $result = $this->connection->select('c.id, c.id_ident, ci.ident, ci.type, ' .
             'IFNULL(lo_c.id_locale, c.id_locale) id_locale, ' .
@@ -70,64 +69,6 @@ class DibiDriver extends Configurator
             ->join($this->tableConfigurator)->as('c')->on('c.id_ident=ci.id')->and(['c.id_locale' => $this->idDefaultLocale])
             ->leftJoin($this->tableConfigurator)->as('lo_c')->on('lo_c.id_ident=ci.id')->and(['lo_c.id_locale' => $idLocale ?: $this->locale->getId()]);
         return $result;
-    }
-
-
-    /**
-     * Get list data by type.
-     *
-     * @param string   $type
-     * @param int|null $idLocale
-     * @return Fluent
-     */
-    public function getListDataByType(string $type, int $idLocale = null): Fluent
-    {
-        $result = $this->getListData($idLocale)
-            ->where(['ci.type' => $type]);
-        return $result;
-    }
-
-
-    /**
-     * Get list data type.
-     *
-     * @return array
-     */
-    public function getListDataType(): array
-    {
-        return $this->connection->select('id, type')
-            ->from($this->tableConfiguratorIdent)
-            ->groupBy('type')
-            ->orderBy(['type' => 'ASC'])
-            ->fetchPairs('id', 'type');
-    }
-
-
-    /**
-     * Get data by id.
-     *
-     * @param int      $idIdent
-     * @param int|null $idLocale
-     * @return array
-     */
-    public function getDataById(int $idIdent, int $idLocale = null): array
-    {
-        $result = $this->getListData($idLocale)
-            ->where(['c.id_ident' => $idIdent]);
-        return (array) ($result->fetch() ?: []);
-    }
-
-
-    /**
-     * Get list ident.
-     *
-     * @return array
-     */
-    public function getListIdent(): array
-    {
-        return $this->connection->select('id, ident')
-            ->from($this->tableConfiguratorIdent)
-            ->fetchPairs('id', 'ident');
     }
 
 
@@ -175,59 +116,7 @@ class DibiDriver extends Configurator
 
 
     /**
-     * Get data by ident.
-     *
-     * @param string   $ident
-     * @param int|null $idLocale
-     * @return array
-     */
-    public function getDataByIdent(string $ident, int $idLocale = null): array
-    {
-        if (isset($this->flattenValues[$ident])) {
-            return (array) $this->flattenValues[$ident];
-        } else {
-            $result = $this->getListData($idLocale)
-                ->where(['ci.ident' => $ident]);
-            return (array) ($result->fetch() ?: []);
-        }
-    }
-
-
-    /**
-     * Get internal id identification.
-     *
-     * @param array $values
-     * @return int
-     * @throws \Dibi\Exception
-     */
-    protected function getInternalIdIdentification(array $values): int
-    {
-        $cacheKey = 'getIdIdentification' . md5(implode($values));
-        $result = $this->cache->load($cacheKey);
-        if ($result === null) {
-            $result = $this->connection->select('id')
-                ->from($this->tableConfiguratorIdent)
-                ->where($values)
-                ->fetchSingle();
-
-            // insert new identification if not exist
-            if (!$result) {
-                $result = $this->connection->insert($this->tableConfiguratorIdent, $values)->execute(Dibi::IDENTIFIER);
-            }
-
-            try {
-                $this->cache->save($cacheKey, $result, [
-                    Cache::TAGS => ['loadData'],
-                ]);
-            } catch (\Throwable $e) {
-            }
-        }
-        return (int) $result;
-    }
-
-
-    /**
-     * Add internal data.
+     * Save internal data.
      *
      * @internal
      * @param string $type
@@ -236,20 +125,20 @@ class DibiDriver extends Configurator
      * @return int
      * @throws \Dibi\Exception
      */
-    protected function addInternalData(string $type, string $identification, string $content = ''): int
+    protected function saveInternalData(string $type, string $identification, string $content = ''): int
     {
         $result = null;
-        $arr = ['ident' => $identification, 'type' => $type];
-        // load identification
-        $idIdentification = $this->getInternalIdIdentification($arr);
-
         // check exist configure id
         $conf = $this->connection->select('id')
-            ->from($this->tableConfigurator)
-            ->where(['id_locale' => $this->idDefaultLocale, 'id_ident' => $idIdentification])
+            ->from($this->tableConfiguratorIdent)
+            ->where(['ident' => $identification])
             ->fetchSingle();
 
         if (!$conf) {
+            $idIdentification = $this->connection->insert($this->tableConfiguratorIdent, [
+                'ident' => $identification, 'type' => $type,
+            ])->execute(Dibi::IDENTIFIER);
+
             // insert data
             $values = [
                 'id_locale' => $this->idDefaultLocale,  // UQ 1/2 - always default create language
@@ -261,7 +150,9 @@ class DibiDriver extends Configurator
             $result = $this->connection->insert($this->tableConfigurator, $values)->execute();
         } else {
             // update data
-            $result = $this->connection->update($this->tableConfigurator, ['content' => $content])->where(['id' => $conf])->execute();
+            $result = $this->connection->update($this->tableConfigurator, [
+                'content' => $content,
+            ])->where(['id' => $conf])->execute();
         }
         $this->cleanCache();
         return (int) $result;
@@ -275,17 +166,10 @@ class DibiDriver extends Configurator
      */
     protected function loadInternalData()
     {
-        $cacheKey = 'values' . $this->locale->getId();
+        $cacheKey = 'loadInternalData' . $this->locale->getId();
         $this->values = $this->cache->load($cacheKey);
         if ($this->values === null) {
-            $types = $this->getListDataType();
-
-            // load rows by type
-            foreach ($types as $type) {
-                $items = $this->getListDataByType($type);
-                $this->values[$type] = $items->fetchAssoc('ident');
-            }
-
+            $this->values = $this->getListData()->fetchAssoc('ident');
             try {
                 $this->cache->save($cacheKey, $this->values, [
                     Cache::TAGS => ['loadData'],
@@ -294,16 +178,7 @@ class DibiDriver extends Configurator
             }
         }
 
-        $cacheKeyFlatten = 'flattenValues' . $this->locale->getId();
-        $this->flattenValues = $this->cache->load($cacheKeyFlatten);
-        if ($this->flattenValues === null) {
-            try {
-                $this->flattenValues = Arrays::flatten($this->values, true);
-                $this->cache->save($cacheKeyFlatten, $this->flattenValues, [
-                    Cache::TAGS => ['loadData'],
-                ]);
-            } catch (\Throwable $e) {
-            }
-        }
+        // process default content
+        $this->searchDefaultContent();
     }
 }

@@ -3,6 +3,7 @@
 namespace Configurator\Bridges\Nette;
 
 use Configurator\Bridges\Tracy\Panel;
+use Configurator\ConfiguratorTranslator;
 use Nette\DI\CompilerExtension;
 
 
@@ -19,9 +20,11 @@ class Extension extends CompilerExtension
         'debugger'    => true,
         'autowired'   => true,
         'driver'      => null,
+        'translator'  => false,
         'searchMask'  => ['*Translation.neon'],
         'searchPath'  => [],
         'excludePath' => [],
+
     ];
 
 
@@ -38,6 +41,16 @@ class Extension extends CompilerExtension
             ->setFactory($config['driver'])
             ->addSetup('setSearchPath', [$config['searchMask'], $config['searchPath'], $config['excludePath']])
             ->setAutowired($config['autowired']);
+
+        // define system translator
+        if ($config['translator']) {
+            $translate = $builder->addDefinition($this->prefix('translate'))
+                ->setFactory(ConfiguratorTranslator::class);
+
+            // linked filter to latte
+            $builder->getDefinition('latte.latteFactory')
+                ->addSetup('addFilter', ['translate', [$translate, 'translate']]);
+        }
 
         // define panel
         if ($config['debugger']) {

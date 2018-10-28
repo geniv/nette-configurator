@@ -2,7 +2,7 @@
 
 namespace Configurator;
 
-use Dibi\Fluent;
+use Dibi\IDataSource;
 
 
 /**
@@ -15,48 +15,12 @@ interface IConfigurator
 {
 
     /**
-     * Get list ident.
-     *
-     * @return array
-     */
-    public function getListIdent(): array;
-
-
-    /**
      * Get list data.
      *
      * @param int|null $idLocale
-     * @return Fluent
+     * @return IDataSource
      */
-    public function getListData(int $idLocale = null): Fluent;
-
-
-    /**
-     * Get list data by type.
-     *
-     * @param string   $type
-     * @param int|null $idLocale
-     * @return Fluent
-     */
-    public function getListDataByType(string $type, int $idLocale = null): Fluent;
-
-
-    /**
-     * Get list data type.
-     *
-     * @return array
-     */
-    public function getListDataType(): array;
-
-
-    /**
-     * Get data by id.
-     *
-     * @param int      $idIdent
-     * @param int|null $idLocale
-     * @return array
-     */
-    public function getDataById(int $idIdent, int $idLocale = null): array;
+    public function getListData(int $idLocale = null): IDataSource;
 
 
     /**
@@ -65,7 +29,6 @@ interface IConfigurator
      * @param int   $id
      * @param array $values
      * @return int
-     * @throws \Dibi\Exception
      */
     public function editData(int $id, array $values): int;
 
@@ -75,7 +38,6 @@ interface IConfigurator
      *
      * @param int $id
      * @return int
-     * @throws \Dibi\Exception
      */
     public function deleteData(int $id): int;
 
@@ -84,14 +46,4 @@ interface IConfigurator
      * Clean cache.
      */
     public function cleanCache();
-
-
-    /**
-     * Get data by ident.
-     *
-     * @param string   $ident
-     * @param int|null $idLocale
-     * @return array
-     */
-    public function getDataByIdent(string $ident, int $idLocale = null): array;
 }

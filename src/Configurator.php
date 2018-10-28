@@ -5,11 +5,7 @@ namespace Configurator;
 use Exception;
 use Locale\ILocale;
 use Nette\Application\UI\Control;
-use Nette\Neon\Neon;
-use Nette\Utils\Finder;
-use Nette\Utils\Strings;
 use SearchContent;
-use SplFileInfo;
 
 
 /**
@@ -68,6 +64,7 @@ abstract class Configurator extends Control implements IConfigurator
      */
     public function isEnable(string $identification): bool
     {
+        $this->loadInternalData();  // load data
         return (bool) ($this->values[$identification]['enable'] ?? false);
     }
 
@@ -75,10 +72,12 @@ abstract class Configurator extends Control implements IConfigurator
     /**
      * Get values.
      *
+     * @internal
      * @return array
      */
     public function getValues(): array
     {
+        $this->loadInternalData();  // load data
         return $this->values ?? [];
     }
 
@@ -86,11 +85,13 @@ abstract class Configurator extends Control implements IConfigurator
     /**
      * Get values by type.
      *
+     * @internal
      * @param string $type
      * @return array
      */
     public function getValuesByType(string $type): array
     {
+        $this->loadInternalData();  // load data
         return array_filter($this->values, function ($item) use ($type) {
             return ($item['type'] == $type);
         });
@@ -105,6 +106,7 @@ abstract class Configurator extends Control implements IConfigurator
      */
     public function getValue(string $identification)
     {
+        $this->loadInternalData();  // load data
         return ($this->values[$identification] ?? null);
     }
 
@@ -124,8 +126,6 @@ abstract class Configurator extends Control implements IConfigurator
             if ($this->locale->isReady() && !$this->values) {
 //                \Tracy\Debugger::fireLog('Configurator::__call');
                 $this->loadInternalData();  // load data
-                // process default content
-                $this->searchDefaultContent();
             }
 
             if (!isset($args[0])) {
@@ -221,10 +221,12 @@ abstract class Configurator extends Control implements IConfigurator
     /**
      * Search default content.
      *
+     * @internal
      * @throws \Dibi\Exception
      */
     private function searchDefaultContent()
     {
+        // call in: loadInternalData()
         if ($this->searchContent) {
             $this->listAllContent = $this->searchContent->getList();
 
@@ -244,6 +246,7 @@ abstract class Configurator extends Control implements IConfigurator
     /**
      * Get list used content.
      *
+     * @internal
      * @return array
      */
     public function getListUsedContent(): array
@@ -255,6 +258,7 @@ abstract class Configurator extends Control implements IConfigurator
     /**
      * Get list category content.
      *
+     * @internal
      * @return array
      */
     public function getListCategoryContent(): array
@@ -266,6 +270,7 @@ abstract class Configurator extends Control implements IConfigurator
     /**
      * Get list all content.
      *
+     * @internal
      * @return array
      */
     public function getListAllContent(): array

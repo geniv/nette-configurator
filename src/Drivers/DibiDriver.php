@@ -177,5 +177,8 @@ class DibiDriver extends Configurator
             } catch (\Throwable $e) {
             }
         }
+
+        // process default content
+        $this->searchDefaultContent();
     }
 }

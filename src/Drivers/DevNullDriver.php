@@ -40,6 +40,9 @@ class DevNullDriver extends Configurator
     {
         // set fake translate
         $this->values['__DevNullDriver__'] = true;
+
+        // process default content
+        $this->searchDefaultContent();
     }
 
 

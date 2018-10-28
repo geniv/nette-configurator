@@ -220,6 +220,17 @@ abstract class Configurator extends Control implements IConfigurator
 
 
     /**
+     * Get search content.
+     *
+     * @return SearchContent
+     */
+    public function getSearchContent(): SearchContent
+    {
+        return $this->searchContent;
+    }
+
+
+    /**
      * Search default content.
      *
      * @internal

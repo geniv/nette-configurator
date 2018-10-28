@@ -54,7 +54,7 @@ class ConfiguratorTranslator extends Translator
                 return $item['content'];
             }, $translation);
 
-            //$this->configurator->getListData()->fetchPairs('ident', 'content');
+//            $this->dictionary = $this->configurator->getListData()->fetchPairs('ident', 'content');
             try {
                 $this->cache->save($cacheKey, $this->dictionary, [
                     Cache::TAGS => ['saveCache'],
@@ -76,5 +76,19 @@ class ConfiguratorTranslator extends Translator
     protected function saveTranslate(string $identification, $message, $idLocale = null): string
     {
         return $this->configurator->setTranslation($identification, $message);
+    }
+
+
+    /**
+     * Search default translate.
+     *
+     * @internal
+     */
+    protected function searchDefaultTranslate()
+    {
+        $searchContent = $this->configurator->getSearchContent();
+        $this->setSearchPath($searchContent->getSearchMask(), $searchContent->getSearchPath(), $searchContent->getExcludePath());
+        // call parent
+        parent::searchDefaultTranslate();
     }
 }

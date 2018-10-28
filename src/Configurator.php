@@ -208,6 +208,7 @@ abstract class Configurator extends Control implements IConfigurator
     /**
      * Set path search.
      *
+     * @internal
      * @param array $searchMask
      * @param array $searchPath
      * @param array $excludePath

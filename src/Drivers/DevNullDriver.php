@@ -3,7 +3,7 @@
 namespace Configurator\Drivers;
 
 use Configurator\Configurator;
-use Dibi\Fluent;
+use Dibi\IDataSource;
 
 
 /**
@@ -26,7 +26,7 @@ class DevNullDriver extends Configurator
      */
     protected function saveInternalData(string $type, string $identification, string $content = ''): int
     {
-        $this->values[$identification] = ['ident' => $identification, 'type' => $type, 'content' => $content, 'enable' => true];
+        $this->values[$identification] = ['type' => $type, 'content' => $content, 'enable' => true];
         return 1;
     }
 
@@ -47,9 +47,9 @@ class DevNullDriver extends Configurator
      * Get list data.
      *
      * @param int|null $idLocale
-     * @return Fluent
+     * @return IDataSource
      */
-    public function getListData(int $idLocale = null): Fluent
+    public function getListData(int $idLocale = null): IDataSource
     {
         //
     }

@@ -5,7 +5,7 @@ namespace Configurator\Drivers;
 use Configurator\Configurator;
 use dibi;
 use Dibi\Connection;
-use Dibi\Fluent;
+use Dibi\IDataSource;
 use Locale\ILocale;
 use Nette\Caching\Cache;
 use Nette\Caching\IStorage;
@@ -57,9 +57,9 @@ class DibiDriver extends Configurator
      * Get list data.
      *
      * @param int|null $idLocale
-     * @return Fluent
+     * @return IDataSource
      */
-    public function getListData(int $idLocale = null): Fluent
+    public function getListData(int $idLocale = null): IDataSource
     {
         $result = $this->connection->select('c.id, c.id_ident, ci.ident, ci.type, ' .
             'IFNULL(lo_c.id_locale, c.id_locale) id_locale, ' .

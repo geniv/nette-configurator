@@ -2,7 +2,7 @@
 
 namespace Configurator;
 
-use Dibi\Fluent;
+use Dibi\IDataSource;
 
 
 /**
@@ -18,9 +18,9 @@ interface IConfigurator
      * Get list data.
      *
      * @param int|null $idLocale
-     * @return Fluent
+     * @return IDataSource
      */
-    public function getListData(int $idLocale = null): Fluent;
+    public function getListData(int $idLocale = null): IDataSource;
 
 
     /**

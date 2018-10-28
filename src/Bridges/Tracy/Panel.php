@@ -4,6 +4,7 @@ namespace Configurator\Bridges\Tracy;
 
 use Configurator\IConfigurator;
 use Latte\Engine;
+use Nette\Localization\ITranslator;
 use Nette\SmartObject;
 use Tracy\IBarPanel;
 
@@ -20,16 +21,20 @@ class Panel implements IBarPanel
 
     /** @var IConfigurator */
     private $configurator;
+    /** @var ITranslator */
+    private $translator;
 
 
     /**
      * Panel constructor.
      *
-     * @param IConfigurator $configurator
+     * @param IConfigurator    $configurator
+     * @param ITranslator|null $translator
      */
-    public function __construct(IConfigurator $configurator)
+    public function __construct(IConfigurator $configurator, ITranslator $translator = null)
     {
         $this->configurator = $configurator;
+        $this->translator = $translator;
     }
 
 
@@ -57,9 +62,9 @@ class Panel implements IBarPanel
         $params = [
             'class'               => get_class($this->configurator),
             'listUsedContent'     => $this->configurator->getListUsedContent(),     // list used content index
+            'listUsedTranslate'   => ($this->translator ? $this->translator->getListUsedTranslate() : []),  // list translator index
             'listAllContent'      => $this->configurator->getListAllContent(),      // list all content
             'listCategoryContent' => $this->configurator->getListCategoryContent(), // list category content
-            //            'values'              => $this->configurator->getValues(),       // list values
         ];
         $latte = new Engine;
         return $latte->renderToString(__DIR__ . '/PanelTemplate.latte', $params);

@@ -57,7 +57,7 @@
                             {$item['type']}
                         </td>
                         <td style="text-align: center;">
-                            {ifset $listUsedContent[$ident]}{include #svgTrue}{else}{include #svgFalse}{/ifset}
+                            {if isset($listUsedContent[$ident]) || isset($listUsedTranslate[$ident])}{include #svgTrue}{else}{include #svgFalse}{/if}
                         </td>
                     </tr>
                     <tr n:if="!$iterations">

@@ -17,7 +17,8 @@
     "php": ">=7.0.0",
     "dibi/dibi": ">=3.0.0",
     "geniv/nette-locale": ">=1.0.0",
-    "geniv/nette-translator": "dev-develop"
+    "geniv/nette-search-content": ">=1.0.0",
+    "geniv/nette-translator": ">=2.0.0"
   },
   "autoload": {
     "classmap": [

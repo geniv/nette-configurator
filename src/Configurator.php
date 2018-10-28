@@ -8,6 +8,7 @@ use Nette\Application\UI\Control;
 use Nette\Neon\Neon;
 use Nette\Utils\Finder;
 use Nette\Utils\Strings;
+use SearchContent;
 use SplFileInfo;
 
 
@@ -27,7 +28,9 @@ abstract class Configurator extends Control implements IConfigurator
     /** @var bool */
     private $autoCreate = true;
     /** @var array */
-    private $searchMask, $searchPath, $excludePath, $listCategoryContent = [], $listAllContent = [], $listUsedContent = [];
+    private $listAllContent = [], $listUsedContent = [];
+    /** @var SearchContent */
+    private $searchContent;
 
 
     /**
@@ -108,7 +111,7 @@ abstract class Configurator extends Control implements IConfigurator
 //                \Tracy\Debugger::fireLog('Configurator::__call');
                 $this->loadInternalData();  // load data
                 // process default content
-                $this->searchDefaultContent($this->searchMask, $this->searchPath, $this->excludePath);
+                $this->searchDefaultContent();
             }
 
             if (!isset($args[0])) {
@@ -197,23 +200,30 @@ abstract class Configurator extends Control implements IConfigurator
      */
     public function setSearchPath(array $searchMask = [], array $searchPath = [], array $excludePath = [])
     {
-        $this->searchMask = $searchMask;
-        $this->searchPath = $searchPath;
-        $this->excludePath = $excludePath;
+        $this->searchContent = new SearchContent($searchMask, $searchPath, $excludePath);
     }
 
 
     /**
      * Search default content.
      *
-     * @param array $searchMask
-     * @param array $searchPath
-     * @param array $excludePath
      * @throws \Dibi\Exception
      */
-    private function searchDefaultContent(array $searchMask, array $searchPath = [], array $excludePath = [])
+    private function searchDefaultContent()
     {
-        if ($searchMask && $searchPath) {
+        $this->listAllContent = $this->searchContent->getList();
+
+        if ($this->values && $this->listAllContent) {
+            // list all content
+            foreach ($this->listAllContent as $index => $item) {
+                // call only if values does not exist or values is default ## value
+                if (!isset($this->values[$index]) || $this->values[$index]['content'] == $this->getDefaultContent($item['type'], $index)) {
+                    $this->saveInternalData($item['type'], $index, $item['value']); // insert data
+                }
+            }
+        }
+
+        /*if ($searchMask && $searchPath) {
             $files = [];
             foreach ($searchPath as $path) {
                 // insert dirs
@@ -265,7 +275,7 @@ abstract class Configurator extends Control implements IConfigurator
                     }
                 }
             }
-        }
+        }*/
     }
 
 
@@ -287,7 +297,7 @@ abstract class Configurator extends Control implements IConfigurator
      */
     public function getListCategoryContent(): array
     {
-        return $this->listCategoryContent;
+        return $this->searchContent->getListCategory();
     }
 
 

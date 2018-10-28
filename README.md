@@ -25,7 +25,7 @@ Include in application
 
 available source drivers:
 - DevNullDriver (default values)
-- DibiDriver (dibi + cache)
+- DibiDriver (dibi + cache `_Configurator-ConfiguratorTranslator`)
 
 neon configure:
 ```neon

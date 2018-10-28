@@ -44,12 +44,17 @@ class ConfiguratorTranslator extends Translator
      */
     protected function loadTranslate()
     {
-        $cacheKey = 'dictionary' . $this->locale->getId();
+        $cacheKey = 'loadTranslate' . $this->locale->getId();
 //        \Tracy\Debugger::fireLog('ConfiguratorDriver::loadTranslate; cacheKey ' . $cacheKey);
         $this->dictionary = $this->cache->load($cacheKey);
         if ($this->dictionary === null) {
-//FIXME opravit nacitani list data!!!! musi brat v potaz to ze pokud je dev null translator musi brat values!!!
-            $this->dictionary = [];//$this->configurator->getListData()->fetchPairs('ident', 'content');
+            $translation = $this->configurator->getValuesByType('translation');
+
+            $this->dictionary = array_map(function ($item) {
+                return $item['content'];
+            }, $translation);
+
+            //$this->configurator->getListData()->fetchPairs('ident', 'content');
             try {
                 $this->cache->save($cacheKey, $this->dictionary, [
                     Cache::TAGS => ['saveCache'],

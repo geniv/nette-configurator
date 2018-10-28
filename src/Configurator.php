@@ -84,6 +84,20 @@ abstract class Configurator extends Control implements IConfigurator
 
 
     /**
+     * Get values by type.
+     *
+     * @param string $type
+     * @return array
+     */
+    public function getValuesByType(string $type): array
+    {
+        return array_filter($this->values, function ($item) use ($type) {
+            return ($item['type'] == $type);
+        });
+    }
+
+
+    /**
      * Get value.
      *
      * @param string $identification

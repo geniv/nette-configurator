@@ -116,40 +116,6 @@ class DibiDriver extends Configurator
 
 
     /**
-     * Get internal id identification.
-     *
-     * @deprecated
-     * @param array $values
-     * @return int
-     * @throws \Dibi\Exception
-     */
-    protected function getInternalIdIdentification(array $values): int
-    {
-        $cacheKey = 'getIdIdentification' . md5(implode($values));
-        $result = $this->cache->load($cacheKey);
-        if ($result === null) {
-            $result = $this->connection->select('id')
-                ->from($this->tableConfiguratorIdent)
-                ->where($values)
-                ->fetchSingle();
-//TODO zjednodusit!!
-            // insert new identification if not exist
-            if (!$result) {
-                $result = $this->connection->insert($this->tableConfiguratorIdent, $values)->execute(Dibi::IDENTIFIER);
-            }
-
-            try {
-                $this->cache->save($cacheKey, $result, [
-                    Cache::TAGS => ['loadData'],
-                ]);
-            } catch (\Throwable $e) {
-            }
-        }
-        return (int) $result;
-    }
-
-
-    /**
      * Save internal data.
      *
      * @internal
@@ -162,17 +128,17 @@ class DibiDriver extends Configurator
     protected function saveInternalData(string $type, string $identification, string $content = ''): int
     {
         $result = null;
-        $arr = ['ident' => $identification, 'type' => $type];
-        // load identification
-        $idIdentification = $this->getInternalIdIdentification($arr);
-//FIXME prepsat!!
         // check exist configure id
         $conf = $this->connection->select('id')
-            ->from($this->tableConfigurator)
-            ->where(['id_locale' => $this->idDefaultLocale, 'id_ident' => $idIdentification])
+            ->from($this->tableConfiguratorIdent)
+            ->where(['ident' => $identification])
             ->fetchSingle();
 
         if (!$conf) {
+            $idIdentification = $this->connection->insert($this->tableConfiguratorIdent, [
+                'ident' => $identification, 'type' => $type,
+            ])->execute(Dibi::IDENTIFIER);
+
             // insert data
             $values = [
                 'id_locale' => $this->idDefaultLocale,  // UQ 1/2 - always default create language
@@ -184,7 +150,9 @@ class DibiDriver extends Configurator
             $result = $this->connection->insert($this->tableConfigurator, $values)->execute();
         } else {
             // update data
-            $result = $this->connection->update($this->tableConfigurator, ['content' => $content])->where(['id' => $conf])->execute();
+            $result = $this->connection->update($this->tableConfigurator, [
+                'content' => $content,
+            ])->where(['id' => $conf])->execute();
         }
         $this->cleanCache();
         return (int) $result;

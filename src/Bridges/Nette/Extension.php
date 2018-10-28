@@ -20,9 +20,11 @@ class Extension extends CompilerExtension
         'debugger'    => true,
         'autowired'   => true,
         'driver'      => null,
+        'translator'  => false,
         'searchMask'  => ['*Translation.neon'],
         'searchPath'  => [],
         'excludePath' => [],
+
     ];
 
 
@@ -40,13 +42,15 @@ class Extension extends CompilerExtension
             ->addSetup('setSearchPath', [$config['searchMask'], $config['searchPath'], $config['excludePath']])
             ->setAutowired($config['autowired']);
 
-//TODO omezit podminkou!!!!
-        $trans = $builder->addDefinition($this->prefix('translate'))
-            ->setFactory(ConfiguratorTranslator::class);
+        // define system translator
+        if ($config['translator']) {
+            $translate = $builder->addDefinition($this->prefix('translate'))
+                ->setFactory(ConfiguratorTranslator::class);
 
-        // linked filter to latte
-        $builder->getDefinition('latte.latteFactory')
-            ->addSetup('addFilter', ['translate', [$trans, 'translate']]);
+            // linked filter to latte
+            $builder->getDefinition('latte.latteFactory')
+                ->addSetup('addFilter', ['translate', [$translate, 'translate']]);
+        }
 
         // define panel
         if ($config['debugger']) {

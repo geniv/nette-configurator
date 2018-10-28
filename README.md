@@ -16,7 +16,8 @@ require:
 ```json
 "php": ">=7.0.0",
 "dibi/dibi": ">=3.0.0",
-"geniv/nette-locale": ">=1.0.0"
+"geniv/nette-locale": ">=1.0.0",
+"geniv/nette-translator": ">=2.0.0"
 ```
 
 Include in application
@@ -34,6 +35,7 @@ configurator:
 #   autowired: true
 #    driver: Configurator\Drivers\DevNullDriver
     driver: Configurator\Drivers\DibiDriver(%tablePrefix%)
+    translator: false
 #    searchMask: 
 #       - *Translation.neon
     searchPath:

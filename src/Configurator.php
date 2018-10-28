@@ -211,62 +211,10 @@ abstract class Configurator extends Control implements IConfigurator
      */
     private function searchDefaultContent()
     {
-        $this->listAllContent = $this->searchContent->getList();
+        if ($this->searchContent) {
+            $this->listAllContent = $this->searchContent->getList();
 
-        if ($this->values && $this->listAllContent) {
-            // list all content
-            foreach ($this->listAllContent as $index => $item) {
-                // call only if values does not exist or values is default ## value
-                if (!isset($this->values[$index]) || $this->values[$index]['content'] == $this->getDefaultContent($item['type'], $index)) {
-                    $this->saveInternalData($item['type'], $index, $item['value']); // insert data
-                }
-            }
-        }
-
-        /*if ($searchMask && $searchPath) {
-            $files = [];
-            foreach ($searchPath as $path) {
-                // insert dirs
-                if (is_dir($path)) {
-                    $fil = [];
-                    foreach (Finder::findFiles($searchMask)->exclude($excludePath)->from($path) as $file) {
-                        $fil[] = $file;
-                    }
-                    natsort($fil);  // natural sorting path
-                    $files = array_merge($files, $fil);  // merge sort array
-                }
-                // insert file
-                if (is_file($path)) {
-                    $files[] = new SplFileInfo($path);
-                }
-            }
-//TODO globalize search files to self class
-            // load all default content files
-            foreach ($files as $file) {
-                $lengthPath = strlen(dirname(__DIR__, 4));
-                $partPath = substr($file->getRealPath(), $lengthPath + 1);
-                // load neon file
-                $fileContent = (array) Neon::decode(file_get_contents($file->getPathname()));
-                // prepare empty row
-                $this->listCategoryContent[$partPath] = [];
-                // decode type logic
-                $defaultType = 'translation';
-                foreach ($fileContent as $index => $item) {
-                    $prepareType = Strings::match($index, '#@[a-z]+@#');
-                    // content type
-                    $contentType = Strings::trim(implode((array) $prepareType), '@');
-                    // content index
-                    $contentIndex = Strings::replace($index, ['#@[a-z]+@#' => '']);
-                    $value = ['type' => $contentType ?: $defaultType, 'value' => $item];
-                    if ($contentType) {
-                        // select except translation
-                        $this->listCategoryContent[$partPath][$contentIndex] = $value;
-                        $this->listAllContent[$contentIndex] = $value;
-                    }
-                }
-            }
-
-            if ($this->values) {
+            if ($this->values && $this->listAllContent) {
                 // list all content
                 foreach ($this->listAllContent as $index => $item) {
                     // call only if values does not exist or values is default ## value
@@ -275,7 +223,7 @@ abstract class Configurator extends Control implements IConfigurator
                     }
                 }
             }
-        }*/
+        }
     }
 
 

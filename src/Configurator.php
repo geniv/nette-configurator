@@ -224,7 +224,7 @@ abstract class Configurator extends Control implements IConfigurator
      * @internal
      * @throws \Dibi\Exception
      */
-    private function searchDefaultContent()
+    protected function searchDefaultContent()
     {
         // call in: loadInternalData()
         if ($this->searchContent) {

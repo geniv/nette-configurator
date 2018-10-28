@@ -222,6 +222,7 @@ abstract class Configurator extends Control implements IConfigurator
     /**
      * Get search content.
      *
+     * @internal
      * @return SearchContent
      */
     public function getSearchContent(): SearchContent

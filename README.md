@@ -1,5 +1,5 @@
-Configurator
-============
+Configurator & translator
+=========================
 
 Installation
 ------------
@@ -25,7 +25,10 @@ Include in application
 
 available source drivers:
 - DevNullDriver (default values)
-- DibiDriver (dibi + cache `_Configurator-ConfiguratorTranslator`)
+- DibiDriver (dibi + cache `_Configurator-DibiDriver`)
+
+self translator class:
+- ConfiguratorTranslator (cache `_Configurator-ConfiguratorTranslator`)
 
 neon configure:
 ```neon

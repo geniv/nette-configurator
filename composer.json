@@ -1,9 +1,10 @@
 {
   "name": "geniv/nette-configurator",
-  "description": "Configurator component for Nette Framework",
+  "description": "Configurator and translator component for Nette Framework",
   "keywords": [
     "nette",
     "configurator",
+    "translator",
     "geniv"
   ],
   "license": "MIT",

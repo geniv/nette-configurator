@@ -68,7 +68,7 @@ abstract class Configurator extends Control implements IConfigurator
      */
     public function isEnable(string $identification): bool
     {
-        return ($this->values[$identification]['enable'] ?? false);
+        return (bool) ($this->values[$identification]['enable'] ?? false);
     }
 
 

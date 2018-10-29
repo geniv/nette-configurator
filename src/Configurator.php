@@ -47,12 +47,10 @@ abstract class Configurator extends Control implements IConfigurator
      * Set auto create.
      *
      * @param bool $status
-     * @return Configurator
      */
-    public function setAutoCreate(bool $status): self
+    public function setAutoCreate(bool $status)
     {
         $this->autoCreate = $status;
-        return $this;
     }
 
 
@@ -72,7 +70,6 @@ abstract class Configurator extends Control implements IConfigurator
     /**
      * Get values.
      *
-     * @internal
      * @return array
      */
     public function getValues(): array
@@ -85,7 +82,6 @@ abstract class Configurator extends Control implements IConfigurator
     /**
      * Get values by type.
      *
-     * @internal
      * @param string $type
      * @return array
      */

@@ -15,6 +15,49 @@ interface IConfigurator
 {
 
     /**
+     * Set auto create.
+     *
+     * @param bool $status
+     */
+    public function setAutoCreate(bool $status);
+
+
+    /**
+     * Is enable.
+     *
+     * @param string $identification
+     * @return bool
+     */
+    public function isEnable(string $identification): bool;
+
+
+    /**
+     * Get values.
+     *
+     * @return array
+     */
+    public function getValues(): array;
+
+
+    /**
+     * Get values by type.
+     *
+     * @param string $type
+     * @return array
+     */
+    public function getValuesByType(string $type): array;
+
+
+    /**
+     * Get value.
+     *
+     * @param string $identification
+     * @return mixed
+     */
+    public function getValue(string $identification);
+
+
+    /**
      * Get list data.
      *
      * @param int|null $idLocale

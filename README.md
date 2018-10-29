@@ -58,9 +58,11 @@ internal combination `id_ident` and `id_locale` must by unique! type content is 
 
 Internal data are loading in **first** usage component.
 
+Available interface: `IConfigurator`
+
 usage:
 ```php
-protected function createComponentConfig(Configurator $configurator)
+protected function createComponentConfig(IConfigurator $configurator): IConfigurator
 {
     // disable auto create ident
     //$configurator->setAutoCreate(false);

@@ -147,6 +147,16 @@ abstract class Configurator extends Control implements IConfigurator
             if (isset($this->values[$ident])) {
                 $value = $this->values[$ident];
                 $this->listUsedContent[$ident] = $value;    // add to use
+
+                // substitute argument
+                if (isset($args[2])) {
+                    if (is_array($args[2])) {
+                        $value['content'] = vsprintf($value['content'], $args[2]);
+                    } else {
+                        $value['content'] = sprintf($value['content'], $args[2]);
+                    }
+                }
+
                 if ($args[1] ?? false) {
                     // return for renderXXX
                     return ($value['enable'] ? $value['content'] : null);

@@ -79,6 +79,10 @@ $this['config']->renderText('ident');
 // return value of ident
 $this['config']->renderText('ident', true);
 
+// substitute logic
+$this['config']->renderText('ident', null, 'arg');
+$this['config']->renderText('ident', null, ['arg']);
+
 // set data like translator
 $this['config']->setTranslator('ident', 'text');
 $this['config']->setEditor('ident', 'new text');
@@ -91,6 +95,9 @@ usage:
 {control config:text 'web-title'}
 
 {control config:text 'web-title', true}
+
+{control config:text 'web-title', null, 'argument'}
+{control config:text 'web-title', null, ['argument']}
 
 <h1 n:if="$presenter['config']->isEnable('web-title')">{control config:text 'web-title'}</h1>
 

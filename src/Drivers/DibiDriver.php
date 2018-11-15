@@ -149,10 +149,13 @@ class DibiDriver extends Configurator
             // only insert data
             $result = $this->connection->insert($this->tableConfigurator, $values)->execute();
         } else {
-            // update data
-            $result = $this->connection->update($this->tableConfigurator, [
-                'content' => $content,
-            ])->where(['id' => $conf])->execute();
+            // if not empty value - in case first {control ...} in web
+            if ($content) {
+                // update data
+                $result = $this->connection->update($this->tableConfigurator, [
+                    'content' => $content,
+                ])->where(['id' => $conf])->execute();
+            }
         }
         $this->cleanCache();
         return (int) $result;

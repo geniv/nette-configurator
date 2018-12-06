@@ -84,7 +84,7 @@ class DibiDriver extends Configurator
     {
         $result = $this->connection->update($this->tableConfigurator, $values)
             ->where(['id' => $id]);
-        return (int) $result->execute();
+        return (int) $result->execute()->getRowCount();
     }
 
 
@@ -99,7 +99,7 @@ class DibiDriver extends Configurator
     {
         $result = $this->connection->delete($this->tableConfigurator)
             ->where(['id' => $id]);
-        return (int) $result->execute();
+        return (int) $result->execute()->getRowCount();
     }
 
 
@@ -158,7 +158,7 @@ class DibiDriver extends Configurator
             }
         }
         $this->cleanCache();
-        return (int) $result;
+        return (int) $result->getRowCount();
     }
 
 

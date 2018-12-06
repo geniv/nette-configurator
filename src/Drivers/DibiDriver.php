@@ -84,7 +84,7 @@ class DibiDriver extends Configurator
     {
         $result = $this->connection->update($this->tableConfigurator, $values)
             ->where(['id' => $id]);
-        return (int) $result->execute()->getRowCount();
+        return $result->execute()->getRowCount();
     }
 
 
@@ -99,7 +99,7 @@ class DibiDriver extends Configurator
     {
         $result = $this->connection->delete($this->tableConfigurator)
             ->where(['id' => $id]);
-        return (int) $result->execute()->getRowCount();
+        return $result->execute()->getRowCount();
     }
 
 
@@ -127,7 +127,7 @@ class DibiDriver extends Configurator
      */
     protected function saveInternalData(string $type, string $identification, string $content = ''): int
     {
-        $result = null;
+        $result = 0;
         // check exist configure id
         $conf = $this->connection->select('id')
             ->from($this->tableConfiguratorIdent)
@@ -147,18 +147,18 @@ class DibiDriver extends Configurator
                 'enable'    => true,                    // always default enabled
             ];
             // only insert data
-            $result = $this->connection->insert($this->tableConfigurator, $values)->execute();
+            $result = $this->connection->insert($this->tableConfigurator, $values)->execute()->getRowCount();
         } else {
             // if not empty value - in case first {control ...} in web
             if ($content) {
                 // update data
                 $result = $this->connection->update($this->tableConfigurator, [
                     'content' => $content,
-                ])->where(['id' => $conf])->execute();
+                ])->where(['id' => $conf])->execute()->getRowCount();
             }
         }
         $this->cleanCache();
-        return (int) $result->getRowCount();
+        return $result;
     }
 
 

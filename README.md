@@ -9,15 +9,16 @@ $ composer require geniv/nette-configurator
 ```
 or
 ```json
-"geniv/nette-configurator": ">=1.0.0"
+"geniv/nette-configurator": "^4.0"
 ```
 
 require:
 ```json
-"php": ">=7.0.0",
-"dibi/dibi": ">=3.0.0",
-"geniv/nette-locale": ">=1.0.0",
-"geniv/nette-translator": ">=2.0.0"
+"php": "^7.1",
+"dibi/dibi": "^4.0",
+"geniv/nette-locale": "^2.0",
+"geniv/nette-search-content": "^1.0",
+"geniv/nette-translator": "^2.0"
 ```
 
 Include in application

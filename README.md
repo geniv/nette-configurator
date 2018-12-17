@@ -14,11 +14,12 @@ or
 
 require:
 ```json
-"php": "^7.1",
-"dibi/dibi": "^4.0",
-"geniv/nette-locale": "^2.0",
-"geniv/nette-search-content": "^1.0",
-"geniv/nette-translator": "^2.0"
+"php": ">=7.0",
+"nette/nette": ">=2.4",
+"dibi/dibi": ">=3.0",
+"geniv/nette-locale": ">=2.0",
+"geniv/nette-search-content": ">=1.0",
+"geniv/nette-translator": ">=2.0"
 ```
 
 Include in application

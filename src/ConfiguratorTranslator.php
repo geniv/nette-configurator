@@ -40,6 +40,18 @@ class ConfiguratorTranslator extends Translator
 
 
     /**
+     * Clean cache.
+     */
+    public function cleanCache()
+    {
+        // internal clean cache
+        $this->cache->clean([
+            Cache::TAGS => ['loadData'],
+        ]);
+    }
+
+
+    /**
      * Load translate.
      */
     protected function loadTranslate()
@@ -56,7 +68,7 @@ class ConfiguratorTranslator extends Translator
             }, $translation);
             try {
                 $this->cache->save($cacheKey, $this->dictionary, [
-                    Cache::TAGS => ['saveCache'],
+                    Cache::TAGS => ['loadData'],
                 ]);
             } catch (\Throwable $e) {
             }
@@ -77,6 +89,7 @@ class ConfiguratorTranslator extends Translator
      */
     protected function saveTranslate(string $identification, $message, $idLocale = null): string
     {
+        $this->cleanCache();
         return $this->configurator->setTranslation($identification, $message);
     }
 
